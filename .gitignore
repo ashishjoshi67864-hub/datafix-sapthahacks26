@@ -15,3 +15,4 @@ storage/
 Thumbs.db
 .vscode/
 .idea/
+*.exe

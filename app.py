@@ -6,7 +6,10 @@ import html
 import io
 import json
 import os
+import subprocess
+import sys
 import time
+import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -14,26 +17,9 @@ import httpx
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
-import subprocess
-import sys
-import urllib.request
-
-@st.cache_resource
-def start_backend():
-    try:
-        urllib.request.urlopen("http://127.0.0.1:8000/docs", timeout=1)
-    except Exception:
-        subprocess.Popen(
-            [sys.executable, "-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-        time.sleep(2)
-
-start_backend()
 
 # ============================================================================
-# Page Configuration & Metadata (Zero Icons)
+# Page Configuration & Metadata (Zero Icons) - MUST BE FIRST STREAMLIT CALL
 # ============================================================================
 
 st.set_page_config(
@@ -41,6 +27,42 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+# ============================================================================
+# Background Backend Process Manager
+# ============================================================================
+
+@st.cache_resource
+def ensure_backend_alive():
+    """Ensures FastAPI backend is active; auto-starts uvicorn daemon if offline."""
+    if os.getenv("STREAMLIT_TESTING") or os.getenv("PYTEST_CURRENT_TEST"):
+        return
+    try:
+        with urllib.request.urlopen("http://127.0.0.1:8000/health", timeout=0.5) as resp:
+            if resp.status == 200:
+                return
+    except Exception:
+        pass
+
+    try:
+        os.makedirs("storage", exist_ok=True)
+        subprocess.Popen(
+            [sys.executable, "-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        for _ in range(15):
+            time.sleep(0.2)
+            try:
+                with urllib.request.urlopen("http://127.0.0.1:8000/health", timeout=0.2) as resp:
+                    if resp.status == 200:
+                        break
+            except Exception:
+                pass
+    except Exception as e:
+        print(f"DataFix backend auto-spawn note: {e}", file=sys.stderr)
+
+ensure_backend_alive()
 
 # ============================================================================
 # Session State Initialization
