@@ -14,6 +14,23 @@ import httpx
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
+import subprocess
+import sys
+import urllib.request
+
+@st.cache_resource
+def start_backend():
+    try:
+        urllib.request.urlopen("http://127.0.0.1:8000/docs", timeout=1)
+    except Exception:
+        subprocess.Popen(
+            [sys.executable, "-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", "8000"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        time.sleep(2)
+
+start_backend()
 
 # ============================================================================
 # Page Configuration & Metadata (Zero Icons)
