@@ -229,8 +229,8 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
     output_sha256 = html.escape(str(quality_report.get("output_sha256", "N/A")))
     latency_str = f"{latency:.2f}s" if latency else "< 1.0s"
 
-    # SVG circular gauge math: radius 52, circumference 2 * pi * 52 ≈ 326.7
-    circumference = 326.7
+    # SVG circular gauge math: radius 38, circumference 2 * pi * 38 ≈ 238.76
+    circumference = 238.76
     before_offset = circumference * (1.0 - (min(100.0, max(0.0, before_score)) / 100.0))
     after_offset = circumference * (1.0 - (min(100.0, max(0.0, after_score)) / 100.0))
 
@@ -289,7 +289,7 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
         gap: 16px;
       }}
       .gauge-col {{
-        flex: 0 0 210px;
+        flex: 0 0 135px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -298,32 +298,32 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
       }}
       .flow-col {{
         flex: 1 1 auto;
-        min-width: 320px;
+        min-width: 440px;
       }}
       .kpi-col {{
-        flex: 0 0 280px;
+        flex: 0 0 250px;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 8px;
       }}
       .kpi-tile {{
         background-color: #F8FAFC;
         border: 1px solid #E2E8F0;
         border-radius: 8px;
-        padding: 12px 14px;
+        padding: 10px 12px;
       }}
-      .kpi-title {{ font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 4px; }}
-      .kpi-val {{ font-size: 26px; font-weight: 800; color: #0F172A; line-height: 1.1; }}
-      .kpi-sub {{ font-size: 11px; color: #64748B; margin-top: 3px; font-weight: 500; }}
+      .kpi-title {{ font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 3px; }}
+      .kpi-val {{ font-size: 22px; font-weight: 800; color: #0F172A; line-height: 1.1; }}
+      .kpi-sub {{ font-size: 10px; color: #64748B; margin-top: 2px; font-weight: 500; }}
       .delta-pill {{
         background: rgba(79, 70, 229, 0.08);
         color: #4F46E5;
         border: 1px solid rgba(79, 70, 229, 0.25);
         border-radius: 20px;
-        padding: 5px 12px;
-        font-size: 12px;
+        padding: 3px 8px;
+        font-size: 11px;
         font-weight: 700;
-        margin-top: 6px;
+        margin-top: 4px;
         display: inline-block;
       }}
       .provenance-bar {{
@@ -361,64 +361,67 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
 
         <!-- Column 1: Dual-Arc Health Gauge -->
         <div class="gauge-col">
-          <svg width="140" height="140" viewBox="0 0 130 130">
+          <svg width="105" height="105" viewBox="0 0 100 100">
             <!-- Background track -->
-            <circle cx="65" cy="65" r="52" fill="none" stroke="#E2E8F0" stroke-width="10"/>
-            <!-- Before Health Arc (Dim Cyan) -->
-            <circle cx="65" cy="65" r="52" fill="none" stroke="#CBD5E1" stroke-width="6" stroke-dasharray="{circumference}" stroke-dashoffset="{before_offset}" stroke-linecap="round" opacity="0.5" transform="rotate(-90 65 65)"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#E2E8F0" stroke-width="7"/>
+            <!-- Before Health Arc (Dim) -->
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#CBD5E1" stroke-width="5" stroke-dasharray="{circumference}" stroke-dashoffset="{before_offset}" stroke-linecap="round" opacity="0.6" transform="rotate(-90 50 50)"/>
             <!-- After Health Arc (Indigo) -->
-            <circle cx="65" cy="65" r="52" fill="none" stroke="#4F46E5" stroke-width="10" stroke-dasharray="{circumference}" stroke-dashoffset="{after_offset}" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#4F46E5" stroke-width="7" stroke-dasharray="{circumference}" stroke-dashoffset="{after_offset}" stroke-linecap="round" transform="rotate(-90 50 50)"/>
             <!-- Center Text -->
-            <text x="65" y="60" text-anchor="middle" fill="#0F172A" font-size="26" font-weight="800" id="health-num">{after_score:.2f}%</text>
-            <text x="65" y="76" text-anchor="middle" fill="#64748B" font-size="11" font-weight="700" letter-spacing="0.5">HEALTH SCORE</text>
+            <text x="50" y="47" text-anchor="middle" fill="#0F172A" font-size="16" font-weight="800" id="health-num">{after_score:.2f}%</text>
+            <text x="50" y="59" text-anchor="middle" fill="#64748B" font-size="8" font-weight="700" letter-spacing="0.5">HEALTH SCORE</text>
           </svg>
           <div class="delta-pill">+{delta:.2f} pts Health Delta</div>
         </div>
 
         <!-- Column 2: Live Pipeline Execution Flow Diagram -->
         <div class="flow-col">
-          <svg width="100%" height="150" viewBox="0 0 460 150" fill="none">
+          <svg width="100%" height="135" viewBox="0 0 545 130" fill="none">
             <!-- Node 1: Raw Ingest -->
-            <rect x="5" y="45" width="80" height="48" rx="6" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
-            <text x="45" y="66" fill="#4F46E5" font-size="11" font-weight="800" text-anchor="middle">RAW INGEST</text>
-            <text x="45" y="80" fill="#64748B" font-size="10" font-weight="500" text-anchor="middle">{original_rows} rows</text>
+            <rect x="5" y="30" width="96" height="52" rx="8" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
+            <text x="53" y="52" fill="#4F46E5" font-size="12" font-weight="800" text-anchor="middle">RAW INGEST</text>
+            <text x="53" y="68" fill="#64748B" font-size="11" font-weight="500" text-anchor="middle">{original_rows} rows</text>
 
             <!-- Connector 1 -->
-            <line class="{flow_line_class}" x1="85" y1="69" x2="115" y2="69" stroke="#4F46E5" stroke-width="2"/>
+            <line class="{flow_line_class}" x1="101" y1="56" x2="136" y2="56" stroke="#4F46E5" stroke-width="2"/>
 
             <!-- Node 2: Stage 1 -->
-            <rect x="115" y="45" width="85" height="48" rx="6" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
-            <text x="157" y="66" fill="#4F46E5" font-size="11" font-weight="800" text-anchor="middle">STAGE 1</text>
-            <text x="157" y="80" fill="#64748B" font-size="10" font-weight="500" text-anchor="middle">{stage1_repairs} fixes</text>
+            <rect x="136" y="30" width="96" height="52" rx="8" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
+            <text x="184" y="52" fill="#4F46E5" font-size="12" font-weight="800" text-anchor="middle">STAGE 1</text>
+            <text x="184" y="68" fill="#64748B" font-size="11" font-weight="500" text-anchor="middle">{stage1_repairs} fixes</text>
 
             <!-- Connector 2 -->
-            <line class="{flow_line_class}" x1="200" y1="69" x2="230" y2="69" stroke="#4F46E5" stroke-width="2"/>
+            <line class="{flow_line_class}" x1="232" y1="56" x2="267" y2="56" stroke="#4F46E5" stroke-width="2"/>
 
             <!-- Node 3: KS Drift Guard -->
-            <rect x="230" y="45" width="75" height="48" rx="6" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
-            <text x="267" y="66" fill="#4F46E5" font-size="11" font-weight="800" text-anchor="middle">KS GUARD</text>
-            <text x="267" y="80" fill="#10B981" font-size="10" font-weight="600" text-anchor="middle">PASSED</text>
+            <rect x="267" y="30" width="96" height="52" rx="8" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
+            <text x="315" y="52" fill="#4F46E5" font-size="12" font-weight="800" text-anchor="middle">KS GUARD</text>
+            <text x="315" y="68" fill="#10B981" font-size="11" font-weight="700" text-anchor="middle">PASSED</text>
 
             <!-- Connector 3 -->
-            <line class="{flow_line_class}" x1="305" y1="69" x2="335" y2="69" stroke="{stage2_stroke}" stroke-width="2"/>
+            <line class="{flow_line_class}" x1="363" y1="56" x2="398" y2="56" stroke="{stage2_stroke}" stroke-width="2"/>
 
             <!-- Node 4: Stage 2 AI Detective -->
-            <rect x="335" y="45" width="85" height="48" rx="6" fill="#F8FAFC" stroke="{stage2_stroke}" stroke-width="1.5" opacity="{stage2_opacity}"/>
-            <text x="377" y="66" fill="{stage2_stroke}" font-size="11" font-weight="800" text-anchor="middle">STAGE 2 AI</text>
-            <text x="377" y="80" fill="#64748B" font-size="10" font-weight="500" text-anchor="middle">{stage2_badge}</text>
+            <rect x="398" y="30" width="96" height="52" rx="8" fill="#F8FAFC" stroke="{stage2_stroke}" stroke-width="1.5" opacity="{stage2_opacity}"/>
+            <text x="446" y="52" fill="{stage2_stroke}" font-size="12" font-weight="800" text-anchor="middle">STAGE 2 AI</text>
+            <text x="446" y="68" fill="#64748B" font-size="11" font-weight="500" text-anchor="middle">{stage2_badge}</text>
 
-            <!-- Quarantine Side-Branch -->
-            <path d="M 157 93 L 157 122 L 335 122" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="3 3"/>
-            <g transform="translate(335, 108)">
-              <rect width="115" height="28" rx="5" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.2"/>
-              <text x="10" y="18" fill="#B91C1C" font-size="10" font-weight="700">QUARANTINE:</text>
-              <text x="82" y="18" fill="#DC2626" font-size="10" font-weight="800">{unresolved_count} trapped</text>
-            </g>
+            <!-- Connector to Clean Output -->
+            <line class="{flow_line_class}" x1="494" y1="56" x2="518" y2="56" stroke="#4F46E5" stroke-width="2"/>
 
             <!-- Final Cleaned Output Indicator -->
-            <g transform="translate(425, 48)">
-              <circle cx="16" cy="21" r="14" fill="#4F46E5" opacity="0.15"/>
-              <circle cx="16" cy="21" r="8" fill="#4F46E5"/>
+            <g transform="translate(518, 38)">
+              <circle cx="16" cy="18" r="14" fill="#4F46E5" opacity="0.15"/>
+              <circle cx="16" cy="18" r="7" fill="#4F46E5"/>
+            </g>
+
+            <!-- Quarantine Side-Branch -->
+            <path d="M 184 82 L 184 105 L 368 105" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="3 3"/>
+            <g transform="translate(368, 91)">
+              <rect width="136" height="28" rx="6" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.2"/>
+              <text x="10" y="18" fill="#B91C1C" font-size="10" font-weight="700">QUARANTINE:</text>
+              <text x="82" y="18" fill="#DC2626" font-size="10" font-weight="800">{unresolved_count} trapped</text>
             </g>
           </svg>
         </div>
