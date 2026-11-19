@@ -476,9 +476,9 @@ def run_stage2_semantic_cleaning(
                 f"Aggregated functional dependency statistics (JSON):\n{json.dumps(serialized_fd)}\n\n"
                 f"Missing categorical cells to impute (JSON):\n{json.dumps(candidate_imputations)}\n\n"
                 f"Task: Impute missing values ONLY when backed by the functional dependency statistics with high purity (>=0.85) and support (>=2).\n"
-                f"RULE: Do NOT include any 'confidence' score in your output.\n"
+                f"RULE: Return ONLY the exact keys shown; do not add extra keys like 'inferences' or 'confidence'.\n"
                 f"Return ONLY a JSON object strictly matching this schema:\n"
-                f'{{"inferences": [{{"row_index": 0, "column": "...", "inferred_value": "...", "reason": "..."}}]}}'
+                f'{{"proposals": [{{"row_index": 0, "column": "...", "proposed_value": "...", "evidence": "..."}}]}}'
             )
             client = ollama.Client(timeout=ollama_timeout)
             response = client.chat(
@@ -491,14 +491,17 @@ def run_stage2_semantic_cleaning(
             content = response["message"]["content"]
             parsed_inf = MissingValueInferenceOutput.model_validate_json(content)
 
-            for inf in parsed_inf.inferences:
+            items = getattr(parsed_inf, "proposals", None) or getattr(parsed_inf, "inferences", [])
+            for inf in items:
                 idx = inf.row_index
                 tgt_c = inf.column
+                inferred_val = getattr(inf, "proposed_value", None) or getattr(inf, "inferred_value", None)
+                reason_str = getattr(inf, "evidence", None) or getattr(inf, "reason", "")
                 if idx in df.index and (pd.isna(df.at[idx, tgt_c]) or str(df.at[idx, tgt_c]).strip() == ""):
                     for key_c in key_col_candidates:
                         k_val = str(df.at[idx, key_c]).strip()
                         rule = fd_rules.get((key_c, tgt_c), {}).get(k_val)
-                        if rule and rule[0] == inf.inferred_value:
+                        if rule and rule[0] == inferred_val:
                             target_val, support, purity = rule
                             conf = round(float(np.clip(0.65 + 0.25 * purity + min(0.04, 0.01 * support), 0.60, 0.94)), 2)
                             repairs.append(
@@ -511,7 +514,7 @@ def run_stage2_semantic_cleaning(
                                     repair_method=RepairMethod.AI_CATEGORICAL_IMPUTE,
                                     stage=CleaningStage.STAGE_2,
                                     confidence=conf,
-                                    reason=f"Imputed missing '{tgt_c}' as '{target_val}' based on {key_c}='{k_val}' (support={support}, purity={round(purity, 2)}): {inf.reason}",
+                                    reason=f"Imputed missing '{tgt_c}' as '{target_val}' based on {key_c}='{k_val}' (support={support}, purity={round(purity, 2)}): {reason_str}",
                                 )
                             )
                             df.at[idx, tgt_c] = target_val
