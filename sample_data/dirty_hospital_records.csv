@@ -1,16 +1,101 @@
-﻿Patient_ID,Patient_Name,Age,Gender,City,Pincode,Admission_Date,Department,Bill_Amount
-P1001,  arjun sharma ,34,M,Bengaluru,560001,12/08/2026,Cardiology,18500
-P1002,Priya Nair,29,F,,560038,2026-08-13,Orthopedics,12400
-P1003,Rohan Verma,245,M,bengaluru,560076,14-08-2026,Neurology,31000
-P1004,Ananya Rao,41,F,Bengaluru,560043,Aug 15 2026,General Medicine,-4500
-P1005,Vikram   Reddy,52,M,,560066,2026/08/16,Cardiology,27800
-P1005,Vikram   Reddy,52,M,,560066,2026/08/16,Cardiology,27800
-P1006,Sneha Kulkarni,31,F,BENGALURU,560010,17/08/2026,Dermatology,
-P1007,Arjun Shrama,34,M,Bengaluru,560001,2026-08-12,Cardiology,18500
-P1008,Karthik Gowda,-19,M,,560057,18/08/2026,ENT,6200
-P1009,meera iyer,63,F,Bengaluru,560004,2026-08-19,Oncology,54000
-P1010,Deepak Joshi,47,M,Bengaluru,560038,20/08/2026,Orthopedics,0
-P1011,  kavya menon,26,F,,560001,2026-08-21,Pediatrics,3900
-P1012,Suresh Babu,158,M,bengaluru,560076,22-08-2026,Cardiology,21500
-P1013,Priya Nair,29,F,Bengaluru,560038,2026-08-13,Orthopedics,12400
-P1014,Nikhil Desai,38,M,,560043,23/08/2026,Neurology,-15200
+Patient_ID,Patient_Name,Age,Gender,City,Pincode,Admission_Date,Department,Bill_Amount
+P1001,Meera Sharma,53,F,,560004,13/09/2026,Cardiology,11644
+P1002,Harish Iyer,75,M,bengaluru,560057,11/08/2026,  oncology ,2925
+P1003,Abhishek Murugesan,51,F,Bengaluru,560004,29/09/2026,General Medicine,32608
+P1004,Sneha   Iyer,30,F,Bengaluru,560004,2026-08-24,Neurology,32214
+P1005,Rahul Kulkarni,77,M,bengaluru,560001,2026-08-15,Oncology,44443
+P1006,Aditya Deshpande,58,Female,bengaluru,560043,2026-09-28,Oncology,35217
+P1007,Neha Desai,46,M,Bengaluru,560066,2026/08/06,Oncology,11565
+P1008,Lakshmi Kumar,50,F,Bengaluru,560057,08/08/2026,ONCOLOGY,3252
+P1009,Arjun Naidu,51,M,,560010,2026/08/07,Cardiology,14208
+P1010,Bhavya Sharma,32,M,Bengaluru,560004,2026-08-16,NEUROLOGY,566325
+P1011,Chetan Murthy,39,M,Bengaluru,560066,2026-08-14,ENT,42253
+P1012,SIDDHARTH RAO,49,Female,Bengaluru,560001,05-09-2026,Cardiology,-24656
+P1013,Vikram Kumar,48,F,bengaluru,560076,2026-08-09,  general medicine ,"?34,312"
+P1014,  anitha desai ,72,F,Bengaluru,560004,11-09-2026,General Medicine,6050
+P1015,Deepak Shetty,41,M,,560001,2026-08-05,GENERAL MEDICINE,18871
+P1016,Bhavya Hegde,45,F,bengaluru,560076,01/08/2026,DERMATOLOGY,"?6,342"
+P1017,Ananya Deshpande,25,M,,560004,2026-08-31,Orthopedics,-6246
+P1018,  rahul bhat ,33,m,Bengaluru,560057,2026-09-08,General Medicine,995850
+P1019,Sanjay Iyer,51,M,Bengaluru,560004,21/08/2026,General Medicine,44803
+P1020,Deepak Desai,26,M,Bengaluru,560043,2026-08-29,Orthopedics,26717
+P1021,Deepak Joshi,32,M,Bengaluru,560043,2026/08/19,Dermatology,"?38,756"
+P1022,Ananya   Verma,72,M,Bengaluru,560066,2026/09/19,  orthopedics ,-5389
+P1023,Kavya   Murthy,22,M,Bengaluru,560038,2026-08-28,Orthopedics,40675
+P1024,Harish Murugesan,37,M,,560057,2026-09-21,Oncology,18014
+P1025,Rahul Joshi,38,female,BENGALURU,560038,03-08-2026,General Medicine,9584
+P1026,Manoj Verma,53,M,Bengaluru,560043,23/09/2026,  dermatology ,35884
+P1027,Anitha Desai,58,F,,560038,27-09-2026,Orthopedics,
+P1028,Kavita Murugesan,58,F,Bengaluru,560043,2026/08/20,General Medicine,10667
+P1029,  prashanth kamath ,40,F,Bengaluru,560057,Sep 23 2026,Pediatrics,22223
+P1030,Chetan Naidu,39,Male,Bengaluru,560038,2026-09-10,  neurology ,21098
+P1031,Rahul Hegde,27,M,,560001,2026-09-15,Orthopedics,43772
+P1032,Divya Kulkarni,168,F,Bengaluru,560076,2026-09-21,Oncology,10453
+P1033,Siddharth Kulkarni,78,M,bengaluru,560004,2026-08-18,General Medicine,18703
+P1034,Sanjay Murthy,28,male,BENGALURU,560076,Aug 10 2026,General Medicine,17655
+P1035,Prashanth Deshpande,20,F,Bengaluru,560066,2026/08/01,General Medicine,40228
+P1036,Manoj Shetty,-19,f,Bengaluru,560066,2026/09/23,  cardiology ,28997
+P1037,Anitha Reddy,77,F,bengaluru,560066,14-08-2026,Orthopedics,19549
+P1038,ANANYA DESAI,46,M,bengaluru,560076,2026-09-30,General Medicine,5138
+P1039,Pooja Desai,39,Male,Bengaluru,560066,Aug 11 2026,  general medicine ,10006
+P1040,Rahul Rao,56,F,Bengaluru,560057,20/09/2026,  ent ,41848
+P1041,Harish Hegde,31,Female,Bengaluru,560043,2026-09-23,Pediatrics,26236
+P1042,MANOJ BABU,49,F,BENGALURU,560076,2026-08-29,Neurology,8179
+P1043,Abhishek Joshi,61,M,,560066,Aug 18 2026,General Medicine,41569
+P1044,Bhavya Deshmukh,20,F,Bengaluru,560057,Aug 16 2026,ENT,17022
+P1045,Lakshmi   Joshi,57,M,bengaluru,560076,21-08-2026,Dermatology,10407
+P1046,Nandini   Menon,47,Male,Bengaluru,560010,2026-09-04,  pediatrics ,-22309
+P1047,Arjun Deshpande,54,M,Bengaluru,560066,Aug 04 2026,CARDIOLOGY,31366
+P1048,Varun Verma,49,F,Bengaluru,560076,20-09-2026,Oncology,29774
+P1049,Ananya Murugesan,30,Female,Bengaluru,560010,17/08/2026,Pediatrics,16117
+P1050,  chetan menon ,22,female,Bengaluru,560038,Aug 30 2026,General Medicine,21028
+P1051,Manoj Reddy,-19,F,Bengaluru,560066,2026-09-06,Pediatrics,41496
+P1052,Rohan Shetty,59,M,Bengaluru,560043,2026/09/13,Neurology,
+P1053,Siddharth Joshi,41,F,BENGALURU,560004,2026-09-01,ENT,31066
+P1054,Bhavya Menon,69,F,Bengaluru,560001,2026-08-06,Pediatrics,-38551
+P1055,  nandini kumar ,64,M,Bengaluru,560076,2026-09-18,PEDIATRICS,35169
+P1056,RAHUL PATIL,38,M,Bengaluru,560004,2026-08-06,Neurology,3396
+P1057,Shreya Kumar,52,Female,Bengaluru,560010,2026-08-16,Dermatology,34121
+P1058,Harish Babu,82,F,Bengaluru,560076,2026/08/20,ENT,2668
+P1059,Prashanth Deshmukh,59,F,Bengaluru,560066,Aug 15 2026,Neurology,18150
+P1060,Rohan Reddy,82,male,,560010,Sep 25 2026,  neurology ,24257
+P1061,Pooja Babu,68,F,Bengaluru,560001,2026-09-24,General Medicine,24032
+P1062,Shreya Iyer,29,F,Bengaluru,560001,15-09-2026,Cardiology,8951
+P1063,SWATHI SHETTY,36,f,Bengaluru,560038,Sep 20 2026,NEUROLOGY,29504
+P1064,Pooja Deshmukh,50,male,Bengaluru,560043,2026-09-13,Oncology,32990
+P1065,Lakshmi Menon,43,F,,560066,25-08-2026,Cardiology,
+P1066,Bhavya Menon,47,M,Bengaluru,560001,13-08-2026,  pediatrics ,"?25,589"
+P1067,Swathi   Naidu,34,f,Bengaluru,560057,2026/08/27,Dermatology,21840
+P1068,Pooja Hegde,55,Female,Bengaluru,560066,2026-08-30,  ent ,24698
+P1069,Neha Sharma,51,F,,560038,Sep 17 2026,ENT,32304
+P1070,Divya Pai,26,Male,Bengaluru,560043,2026-08-20,  orthopedics ,32926
+P1071,Deepak Bhat,76,M,Bengaluru,560066,2026-09-17,  dermatology ,37902
+P1072,Swathi Gowda,74,F,,560043,07/08/2026,Orthopedics,17973
+P1073,Lakshmi Verma,45,M,Bengaluru,560038,04/08/2026,General Medicine,41634
+P1074,Divya Babu,36,F,Bengaluru,560004,2026-09-24,CARDIOLOGY,-41558
+P1075,Abhishek Iyer,-19,F,Bengaluru,560057,2026/08/27,Orthopedics,
+P1076,Divya Murugesan,23,male,Bengaluru,560066,2026-09-11,Pediatrics,36673
+P1077,Siddharth Verma,28,F,BENGALURU,560043,Aug 18 2026,  oncology ,-12221
+P1078,Meera Pai,45,M,BENGALURU,560057,2026-09-22,ENT,17474
+P1079,Chetan Verma,29,M,Bengaluru,560057,2026-09-17,Oncology,8609
+P1080,Anitha Naidu,24,f,Bengaluru,560004,07-08-2026,  ent ,41848
+P1081,Manoj Deshpande,46,M,Bengaluru,560043,22/09/2026,Dermatology,39263
+P1082,Varun   Babu,168,M,,560038,05-08-2026,Pediatrics,39614
+P1083,  swathi menon ,59,f,,560004,26-09-2026,Oncology,39697
+P1084,Siddharth   Shetty,52,F,Bengaluru,560043,28/08/2026,Oncology,
+P1085,Ananya Sharma,44,M,Bengaluru,560066,18/09/2026,Oncology,16343
+P1086,  divya kumar ,245,F,Bengaluru,560066,28-09-2026,  oncology ,-31088
+P1087,Sanjay   Kulkarni,76,F,Bengaluru,560066,2026-09-24,ENT,
+P1088,Suresh Verma,32,M,bengaluru,560010,23-08-2026,Neurology,15207
+P1089,Vikram Kulkarni,81,F,Bengaluru,560057,29/08/2026,Orthopedics,39444
+P1090,  varun joshi ,25,F,,560004,2026-08-29,Oncology,7362
+P1091,Rohan Deshmukh,42,F,Bengaluru,560004,2026/08/04,  neurology ,33670
+P1092,Siddharth Deshmukh,38,F,,560004,2026/09/19,Oncology,21039
+P1003,Abhishek Murugesan,51,F,Bengaluru,560004,29/09/2026,General Medicine,32608
+P1011,Chetan Murthy,39,M,Bengaluru,560066,2026-08-14,ENT,42253
+P1026,Manoj Verma,53,M,Bengaluru,560043,23/09/2026,  dermatology ,35884
+P1041,Harish Hegde,31,Female,Bengaluru,560043,2026-09-23,Pediatrics,26236
+P1097,Aditya Deshpaned,58,Female,bengaluru,560043,2026-09-28,Oncology,35217
+P1098,Bhavya Heged,45,F,bengaluru,560076,01/08/2026,DERMATOLOGY,"?6,342"
+P1099,Rahul Heged,27,M,,560001,2026-09-15,Orthopedics,43772
+P1100,Manoj Redyd,-19,F,Bengaluru,560066,2026-09-06,Pediatrics,41496

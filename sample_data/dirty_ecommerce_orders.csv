@@ -1,11 +1,101 @@
-﻿Order_ID,Customer_Name,Email,City,Pincode,Order_Date,Category,Quantity,Order_Amount
-ORD-501,  rahul deshmukh ,rahul.d@example.com,Bengaluru,560001,01/11/2026,electronics,1,45999
-ORD-502,Nandini Bhat,nandini.bhat@example.com,,560038,2026-11-02,Home & Kitchen,2,3499
-ORD-503,Aditya Kulkarni,aditya.k@example.com,bengaluru,560066,03-11-2026,ELECTRONICS,-1,12999
-ORD-504,Divya Shetty,divya.shetty@example.com,Bengaluru,560076,Nov 04 2026,Fashion,3,2850
-ORD-504,Divya Shetty,divya.shetty@example.com,Bengaluru,560076,Nov 04 2026,Fashion,3,2850
-ORD-505,Rahul Deshmukh,rahul.d@example.com,Bengaluru,560001,2026-11-01,Electronics,1,45999
-ORD-506,  pooja hegde,pooja.h@example.com,,560043,05/11/2026,Beauty,2,-899
-ORD-507,Manoj Kumar,manoj.k@example.com,BENGALURU,560057,2026/11/06,Electronics,1,
-ORD-508,Shreya Nair,shreya.nair@example.com,Bengaluru,560010,07/11/2026,  home & kitchen ,4,5200
-ORD-509,Varun Hegde,varun.h@example.com,,560004,2026-11-08,Fashion,1,1799
+Order_ID,Customer_Name,Email,City,Pincode,Order_Date,Category,Quantity,Order_Amount
+ORD-501,Kavya Babu,kavya.babu1@example.com,,560004,14-11-2026,Beauty,2,20830
+ORD-502,Kavita Reddy,kavita.reddy2@example.com,bengaluru,560038,02-10-2026,BEAUTY,5,28247
+ORD-503,Deepak   Reddy,deepak.reddy_invalid_email,BENGALURU,560010,09/11/2026,Books,1,2972
+ORD-504,Suresh Naidu,suresh.naidu4@example.com,Bengaluru,560076,09-11-2026,Home & Kitchen,4,16065
+ORD-505,Chetan Gowda,chetan.gowda5@example.com,Bengaluru,560010,2026-10-25,SPORTS,5,30755
+ORD-506,Pooja Nair,pooja.nair6@example.com,bengaluru,560010,03-11-2026,SPORTS,3,7222
+ORD-507,  anitha verma ,anitha.verma7@example.com,Bengaluru,560038,Oct 27 2026,Electronics,2,23409
+ORD-508,Priya Babu,priya.babu8@example.com,,560076,Oct 31 2026,Electronics,3,-9516
+ORD-509,PRIYA JOSHI,priya.joshi9@example.com,,560038,Oct 19 2026,Sports,2,
+ORD-510,Meera Hegde,meera.hegde10@example.com,Bengaluru,560038,2026/10/19,Home & Kitchen,1,16354
+ORD-511,Sneha Kumar,sneha.kumar11@example.com,BENGALURU,560076,02/11/2026,Beauty,1,33747
+ORD-512,Pooja   Naidu,pooja.naidu_invalid_email,BENGALURU,560057,2026-10-22,Home & Kitchen,1,7292
+ORD-513,  lakshmi patil ,lakshmi.patil13@example.com,bengaluru,560038,2026-10-30,Fashion,2,4634
+ORD-514,Neha Murthy,neha.murthy14@example.com,BENGALURU,560004,2026-10-04,Beauty,1,13023
+ORD-515,Siddharth Bhat,siddharth.bhat15@example.com,,560066,03/11/2026,Sports,2,33104
+ORD-516,Nikhil Murthy,nikhil.murthy16@example.com,,560076,08-11-2026,Electronics,1,19874
+ORD-517,Abhishek Murugesan,abhishek.murugesan17@example.com,Bengaluru,560010,2026-11-10,Home & Kitchen,3,-4258
+ORD-518,  siddharth nair ,siddharth.nair18@example.com,,560076,2026-11-06,Fashion,2,24506
+ORD-519,  vikram deshpande ,vikram.deshpande19@example.com,bengaluru,560066,2026-10-08,Electronics,3,469075
+ORD-520,Pooja Patil,pooja.patil20@example.com,Bengaluru,560076,2026-10-09,Books,5,"?32,690"
+ORD-521,Sanjay Kamath,sanjay.kamath21@example.com,Bengaluru,560010,2026-10-11,SPORTS,1,19528
+ORD-522,Nandini   Reddy,nandini.reddy22@example.com,Bengaluru,560004,05-11-2026,Books,-4,24675
+ORD-523,Harish Shetty,harish.shetty23@example.com,Bengaluru,560010,2026-10-29,Sports,1,21275
+ORD-524,Nikhil   Reddy,nikhil.reddy24@example.com,Bengaluru,560038,11-10-2026,Sports,1,"?34,453"
+ORD-525,Sneha Joshi,sneha.joshi25@example.com,,560010,06/10/2026,Sports,5,20344
+ORD-526,Kavita Deshpande,kavita.deshpande_invalid_email,Bengaluru,560076,2026-11-06,Sports,1,17843
+ORD-527,Varun Hegde,varun.hegde27@example.com,Bengaluru,560038,11-10-2026,Home & Kitchen,4,5281
+ORD-528,Sanjay Naidu,sanjay.naidu28@example.com,BENGALURU,560076,02/11/2026,Beauty,3,9068
+ORD-529,Karthik Nair,karthik.nair29@example.com,Bengaluru,560057,11/10/2026,Home & Kitchen,4,697525
+ORD-530,LAKSHMI HEGDE,lakshmi.hegde30@example.com,BENGALURU,560001,16-10-2026,Sports,-4,26270
+ORD-531,Chetan Menon,chetan.menon31@example.com,Bengaluru,560038,26-10-2026,  fashion ,1,17831
+ORD-532,Siddharth Murthy,siddharth.murthy32@example.com,Bengaluru,560057,2026/10/07,Fashion,5,
+ORD-533,Nandini Murugesan,nandini.murugesan33@example.com,Bengaluru,560010,2026-10-22,SPORTS,-5,
+ORD-534,Sanjay Kulkarni,sanjay.kulkarni34@example.com,Bengaluru,560043,Nov 02 2026,Electronics,5,20109
+ORD-535,Meera Shetty,meera.shetty35@example.com,Bengaluru,560076,07/11/2026,Books,1,17900
+ORD-536,Prashanth Reddy,prashanth.reddy36@example.com,,560038,Oct 29 2026,Sports,-2,"?7,701"
+ORD-537,Ananya Patil,ananya.patil37@example.com,Bengaluru,560057,2026/10/21,Books,2,31849
+ORD-538,Pooja Murugesan,pooja.murugesan38@example.com,Bengaluru,560076,20-10-2026,Fashion,2,501525
+ORD-539,Manoj Menon,manoj.menon39@example.com,bengaluru,560004,10-10-2026,Beauty,5,26355
+ORD-540,Chetan Gowda,chetan.gowda40@example.com,bengaluru,560001,2026-11-09,SPORTS,5,
+ORD-541,  divya nair ,divya.nair41@example.com,Bengaluru,560010,Oct 09 2026,Beauty,3,7088
+ORD-542,Nandini Menon,nandini.menon42@example.com,Bengaluru,560001,2026-10-15,Home & Kitchen,1,6361
+ORD-543,Nikhil Nair,nikhil.nair43@example.com,,560004,2026-10-19,Fashion,4,12709
+ORD-544,Bhavya Reddy,bhavya.reddy44@example.com,Bengaluru,560001,2026-10-30,Fashion,4,7881
+ORD-545,Nandini Kulkarni,nandini.kulkarni45@example.com,bengaluru,560010,Oct 26 2026,  home & kitchen ,4,34268
+ORD-546,  prashanth iyer ,prashanth.iyer46@example.com,Bengaluru,560038,06/11/2026,Electronics,3,20287
+ORD-547,SURESH BHAT,suresh.bhat47@example.com,,560010,Oct 15 2026,Sports,3,19834
+ORD-548,Chetan Murthy,chetan.murthy48@example.com,,560004,03/11/2026,Sports,2,5864
+ORD-549,NANDINI DESHPANDE,nandini.deshpande49@example.com,Bengaluru,560004,2026-11-13,Beauty,2,34600
+ORD-550,Lakshmi Reddy,lakshmi.reddy50@example.com,BENGALURU,560001,2026-10-20,  sports ,4,30801
+ORD-551,  anitha desai ,anitha.desai51@example.com,Bengaluru,560010,2026-10-31,Books,5,5022
+ORD-552,Harish Desai,harish.desai52@example.com,Bengaluru,560010,2026-11-13,  fashion ,4,25238
+ORD-553,Neha Kumar,neha.kumar53@example.com,Bengaluru,560066,2026-10-30,Home & Kitchen,2,1988
+ORD-554,KAVYA JOSHI,kavya.joshi54@example.com,,560001,Oct 02 2026,Books,-1,27974
+ORD-555,Ananya   Iyer,ananya.iyer55@example.com,Bengaluru,560038,2026-10-04,Books,4,14737
+ORD-556,Sanjay Iyer,sanjay.iyer56@example.com,Bengaluru,560010,2026-10-20,Beauty,2,866475
+ORD-557,Ananya   Desai,ananya.desai57@example.com,BENGALURU,560076,27-10-2026,Home & Kitchen,4,21387
+ORD-558,Kavya Deshmukh,kavya.deshmukh58@example.com,bengaluru,560057,2026-10-09,Beauty,5,27795
+ORD-559,  sneha murthy ,sneha.murthy59@example.com,,560038,Nov 08 2026,Fashion,-2,25217
+ORD-560,Arjun Gowda,arjun.gowda60@example.com,bengaluru,560038,2026/11/14,Fashion,1,31885
+ORD-561,Abhishek Menon,abhishek.menon61@example.com,BENGALURU,560038,31-10-2026,  beauty ,5,
+ORD-562,Divya Naidu,divya.naidu62@example.com,BENGALURU,560038,Oct 13 2026,Books,3,27865
+ORD-563,Kavita   Joshi,kavita.joshi63@example.com,Bengaluru,560076,23/10/2026,Sports,4,32650
+ORD-564,Ananya   Kumar,ananya.kumar_invalid_email,Bengaluru,560004,2026-10-27,ELECTRONICS,1,3678
+ORD-565,Lakshmi Desai,lakshmi.desai_invalid_email,,560043,2026/11/04,  fashion ,5,-32471
+ORD-566,Anitha Kulkarni,anitha.kulkarni66@example.com,BENGALURU,560066,03/11/2026,Beauty,1,"?16,291"
+ORD-567,Rahul Patil,rahul.patil67@example.com,Bengaluru,560001,2026-10-25,Electronics,1,
+ORD-568,ANITHA PAI,anitha.pai68@example.com,Bengaluru,560076,03-10-2026,Electronics,5,6748
+ORD-569,Manoj Murthy,manoj.murthy69@example.com,Bengaluru,560066,2026-10-14,FASHION,1,-21109
+ORD-570,Rahul Deshpande,rahul.deshpande70@example.com,Bengaluru,560004,2026/10/09,  fashion ,4,22239
+ORD-571,  anitha iyer ,anitha.iyer71@example.com,bengaluru,560076,Oct 21 2026,Fashion,3,26497
+ORD-572,Prashanth Shetty,prashanth.shetty72@example.com,Bengaluru,560004,19-10-2026,Beauty,5,6115
+ORD-573,Kavya Naidu,kavya.naidu73@example.com,bengaluru,560010,29/10/2026,Beauty,3,839
+ORD-574,Harish Rao,harish.rao_invalid_email,BENGALURU,560004,2026-10-01,Sports,3,21760
+ORD-575,Rahul   Deshpande,rahul.deshpande75@example.com,,560043,Nov 01 2026,Beauty,4,18122
+ORD-576,Swathi Joshi,swathi.joshi76@example.com,Bengaluru,560057,2026-10-09,Beauty,4,13314
+ORD-577,KAVITA DESHMUKH,kavita.deshmukh77@example.com,BENGALURU,560066,2026-11-14,Fashion,5,21514
+ORD-578,BHAVYA DESHPANDE,bhavya.deshpande78@example.com,Bengaluru,560010,2026-11-06,  sports ,3,26250
+ORD-579,Lakshmi Patil,lakshmi.patil79@example.com,,560043,27-10-2026,BOOKS,3,5031
+ORD-580,Anitha Bhat,anitha.bhat_invalid_email,,560057,2026-11-14,Sports,5,26766
+ORD-581,Sneha Rao,sneha.rao81@example.com,BENGALURU,560057,2026-11-11,  beauty ,3,3402
+ORD-582,Karthik Joshi,karthik.joshi82@example.com,Bengaluru,560010,26-10-2026,Electronics,5,14984
+ORD-583,Shreya Shetty,shreya.shetty83@example.com,bengaluru,560076,22-10-2026,Electronics,1,9783
+ORD-584,Siddharth Babu,siddharth.babu_invalid_email,Bengaluru,560010,2026-10-22,Books,1,-8041
+ORD-585,Nikhil Murthy,nikhil.murthy85@example.com,bengaluru,560066,Oct 26 2026,Books,5,769500
+ORD-586,Nandini Deshmukh,nandini.deshmukh86@example.com,,560004,2026-11-15,SPORTS,-4,"?14,575"
+ORD-587,Sanjay Gowda,sanjay.gowda87@example.com,BENGALURU,560066,2026/11/10,Fashion,3,32577
+ORD-588,Lakshmi   Murugesan,lakshmi.murugesan88@example.com,BENGALURU,560010,21-10-2026,Home & Kitchen,3,6053
+ORD-589,Harish Murugesan,harish.murugesan89@example.com,Bengaluru,560010,2026/11/14,Beauty,4,32393
+ORD-590,Nikhil   Babu,nikhil.babu90@example.com,Bengaluru,560076,Nov 01 2026,Beauty,-5,24028
+ORD-591,SIDDHARTH HEGDE,siddharth.hegde91@example.com,bengaluru,560076,2026/10/18,Beauty,-5,14951
+ORD-592,Meera Deshpande,meera.deshpande92@example.com,Bengaluru,560038,2026-10-03,Electronics,5,24541
+ORD-502,Kavita Reddy,kavita.reddy2@example.com,bengaluru,560038,02-10-2026,BEAUTY,5,28247
+ORD-513,  lakshmi patil ,lakshmi.patil13@example.com,bengaluru,560038,2026-10-30,Fashion,2,4634
+ORD-529,Karthik Nair,karthik.nair29@example.com,Bengaluru,560057,11/10/2026,Home & Kitchen,4,697525
+ORD-546,  prashanth iyer ,prashanth.iyer46@example.com,Bengaluru,560038,06/11/2026,Electronics,3,20287
+ORD-597,Chetan Gowad,chetan.gowda5@example.com,Bengaluru,560010,2026-10-25,SPORTS,5,30755
+ORD-598,Vikram Deshpaned,vikram.deshpande19@example.com,bengaluru,560066,2026-10-08,Electronics,3,469075
+ORD-599,Sanjay Kulkarin,sanjay.kulkarni34@example.com,Bengaluru,560043,Nov 02 2026,Electronics,5,20109
+ORD-600,Sanjay Iyre,sanjay.iyer56@example.com,Bengaluru,560010,2026-10-20,Beauty,2,866475
