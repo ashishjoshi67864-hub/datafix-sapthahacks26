@@ -117,88 +117,80 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
     <head>
     <meta charset="utf-8">
     <style>
-      body {{ margin: 0; padding: 0; background: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }}
+      body {{ margin: 0; padding: 0; overflow: hidden; background: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }}
       {anim_css}
-      .stage-title {{ font-size: 12px; font-weight: 800; fill: #0F172A; letter-spacing: 0.5px; }}
-      .stage-sub {{ font-size: 10px; fill: #475569; font-weight: 500; }}
+      .stage-title {{ font-size: 11px; font-weight: 800; fill: #0F172A; letter-spacing: 0.5px; }}
+      .stage-sub-main {{ font-size: 10px; fill: #334155; font-weight: 600; }}
+      .stage-sub-detail {{ font-size: 9.5px; fill: #64748B; font-weight: 500; }}
       .node-rect {{ rx: 8px; ry: 8px; }}
     </style>
     </head>
     <body>
-    <svg width="100%" height="205" viewBox="0 0 920 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg width="100%" height="205" viewBox="0 0 920 205" fill="none" xmlns="http://www.w3.org/2000/svg">
       <!-- Backdrop card -->
-      <rect width="920" height="200" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+      <rect x="1" y="1" width="918" height="203" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
 
       <!-- Header Label -->
-      <text x="30" y="28" fill="#4F46E5" font-size="12" font-weight="800" letter-spacing="1">NEURO-SYMBOLIC PIPELINE ARCHITECTURE (6-STAGE WORKFLOW)</text>
-      <text x="30" y="44" fill="#64748B" font-size="11">Deterministic Python cleaning engines paired with metadata-only local AI detective</text>
+      <text x="32" y="30" fill="#4F46E5" font-size="12" font-weight="800" letter-spacing="0.75">NEURO-SYMBOLIC PIPELINE ARCHITECTURE (6-STAGE WORKFLOW)</text>
+      <text x="32" y="47" fill="#64748B" font-size="11">Deterministic Python cleaning engines paired with metadata-only local AI detective</text>
 
       <!-- Stage 2 Privacy Shield Box -->
-      <rect class="shield-box" x="180" y="58" width="135" height="102" rx="10" fill="rgba(79, 70, 229, 0.04)" stroke="#6366F1" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <text x="247" y="172" fill="#4F46E5" font-size="10" font-weight="700" text-anchor="middle">Zero Raw-Row PII to LLM</text>
+      <rect class="shield-box" x="170" y="64" width="136" height="90" rx="10" fill="rgba(79, 70, 229, 0.04)" stroke="#6366F1" stroke-width="1.5"/>
+      <text x="238" y="172" fill="#4F46E5" font-size="10" font-weight="700" text-anchor="middle">Zero Raw-Row PII to LLM</text>
 
       <!-- Connector Lines with flowing dash -->
-      <line class="flow-line" x1="135" y1="105" x2="190" y2="105" stroke="#4F46E5" stroke-width="2"/>
-      <line class="flow-line" x1="305" y1="105" x2="360" y2="105" stroke="#6366F1" stroke-width="2"/>
-      <line class="flow-line" x1="475" y1="105" x2="530" y2="105" stroke="#4F46E5" stroke-width="2"/>
-      <line class="flow-line" x1="645" y1="105" x2="700" y2="105" stroke="#6366F1" stroke-width="2"/>
-      <line class="flow-line" x1="815" y1="105" x2="860" y2="105" stroke="#4F46E5" stroke-width="2"/>
+      <line class="flow-line" x1="148" y1="109" x2="180" y2="109" stroke="#4F46E5" stroke-width="2"/>
+      <line class="flow-line" x1="296" y1="109" x2="328" y2="109" stroke="#6366F1" stroke-width="2"/>
+      <line class="flow-line" x1="444" y1="109" x2="476" y2="109" stroke="#4F46E5" stroke-width="2"/>
+      <line class="flow-line" x1="592" y1="109" x2="624" y2="109" stroke="#6366F1" stroke-width="2"/>
+      <line class="flow-line" x1="740" y1="109" x2="772" y2="109" stroke="#4F46E5" stroke-width="2"/>
 
       <!-- Stage 1: DETECT -->
-      <g transform="translate(25, 70)">
-        <rect class="node-rect" width="110" height="70" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#4F46E5" opacity="0.15"/>
-        <circle cx="20" cy="22" r="2.5" fill="#4F46E5"/>
-        <text class="stage-title" x="32" y="25">1. DETECT</text>
-        <text class="stage-sub" x="15" y="44">Stage 1 Profiler</text>
-        <text class="stage-sub" x="15" y="57">Nulls, Types, HTML</text>
+      <g transform="translate(32, 74)">
+        <rect class="node-rect" width="116" height="70" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
+        <text class="stage-title" x="58" y="24" text-anchor="middle">1. DETECT</text>
+        <text class="stage-sub-main" x="58" y="42" text-anchor="middle">Stage 1 Profiler</text>
+        <text class="stage-sub-detail" x="58" y="56" text-anchor="middle">Nulls, Types, HTML</text>
       </g>
 
       <!-- Stage 2: DIAGNOSE -->
-      <g transform="translate(192, 70)">
-        <rect class="node-rect" width="112" height="70" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#6366F1" opacity="0.15"/>
-        <circle cx="20" cy="22" r="2.5" fill="#6366F1"/>
-        <text class="stage-title" x="32" y="25">2. DIAGNOSE</text>
-        <text class="stage-sub" x="15" y="44">Ollama Detective</text>
-        <text class="stage-sub" x="15" y="57">Counts & Patterns</text>
+      <g transform="translate(180, 74)">
+        <rect class="node-rect" width="116" height="70" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
+        <text class="stage-title" x="58" y="24" text-anchor="middle">2. DIAGNOSE</text>
+        <text class="stage-sub-main" x="58" y="42" text-anchor="middle">Ollama Detective</text>
+        <text class="stage-sub-detail" x="58" y="56" text-anchor="middle">Counts &amp; Patterns</text>
       </g>
 
       <!-- Stage 3: REPAIR -->
-      <g transform="translate(362, 70)">
-        <rect class="node-rect" width="112" height="70" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#4F46E5" opacity="0.15"/>
-        <circle cx="20" cy="22" r="2.5" fill="#4F46E5"/>
-        <text class="stage-title" x="32" y="25">3. REPAIR</text>
-        <text class="stage-sub" x="15" y="44">Python Mutator</text>
-        <text class="stage-sub" x="15" y="57">Deduplicate & Impute</text>
+      <g transform="translate(328, 74)">
+        <rect class="node-rect" width="116" height="70" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
+        <text class="stage-title" x="58" y="24" text-anchor="middle">3. REPAIR</text>
+        <text class="stage-sub-main" x="58" y="42" text-anchor="middle">Python Mutator</text>
+        <text class="stage-sub-detail" x="58" y="56" text-anchor="middle">Dedupe &amp; Impute</text>
       </g>
 
       <!-- Stage 4: VALIDATE -->
-      <g transform="translate(532, 70)">
-        <rect class="node-rect" width="112" height="70" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#6366F1" opacity="0.15"/>
-        <circle cx="20" cy="22" r="2.5" fill="#6366F1"/>
-        <text class="stage-title" x="32" y="25">4. VALIDATE</text>
-        <text class="stage-sub" x="15" y="44">KS Drift Guard</text>
-        <text class="stage-sub" x="15" y="57">Auto-Rollback Guard</text>
+      <g transform="translate(476, 74)">
+        <rect class="node-rect" width="116" height="70" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
+        <text class="stage-title" x="58" y="24" text-anchor="middle">4. VALIDATE</text>
+        <text class="stage-sub-main" x="58" y="42" text-anchor="middle">KS Drift Guard</text>
+        <text class="stage-sub-detail" x="58" y="56" text-anchor="middle">Auto-Rollback</text>
       </g>
 
       <!-- Stage 5: EXPLAIN -->
-      <g transform="translate(702, 70)">
-        <rect class="node-rect" width="112" height="70" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#4F46E5" opacity="0.15"/>
-        <circle cx="20" cy="22" r="2.5" fill="#4F46E5"/>
-        <text class="stage-title" x="32" y="25">5. EXPLAIN</text>
-        <text class="stage-sub" x="15" y="44">Pydantic v2 Contract</text>
-        <text class="stage-sub" x="15" y="57">Confidence Tiers</text>
+      <g transform="translate(624, 74)">
+        <rect class="node-rect" width="116" height="70" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
+        <text class="stage-title" x="58" y="24" text-anchor="middle">5. EXPLAIN</text>
+        <text class="stage-sub-main" x="58" y="42" text-anchor="middle">Pydantic Schema</text>
+        <text class="stage-sub-detail" x="58" y="56" text-anchor="middle">Confidence Tiers</text>
       </g>
 
-      <!-- Stage 6: TRACK badge -->
-      <g transform="translate(825, 78)">
-        <circle cx="45" cy="28" r="22" fill="#F8FAFC" stroke="#E11D48" stroke-width="1.5"/>
-        <text x="45" y="25" fill="#E11D48" font-size="10" font-weight="700" text-anchor="middle">6. TRACK</text>
-        <text x="45" y="37" fill="#64748B" font-size="8" text-anchor="middle">SHA-256</text>
+      <!-- Stage 6: TRACK -->
+      <g transform="translate(772, 74)">
+        <rect class="node-rect" width="116" height="70" fill="#F8FAFC" stroke="#E11D48" stroke-width="1.5"/>
+        <text class="stage-title" x="58" y="24" text-anchor="middle" fill="#E11D48">6. TRACK</text>
+        <text class="stage-sub-main" x="58" y="42" text-anchor="middle">SHA-256 Digest</text>
+        <text class="stage-sub-detail" x="58" y="56" text-anchor="middle">Audit Provenance</text>
       </g>
     </svg>
     </body>
@@ -1017,7 +1009,7 @@ else:
 # ============================================================================
 
 if st.session_state.pipeline_result is None:
-    components.html(render_empty_state_svg(motion_enabled), height=210)
+    components.html(render_empty_state_svg(motion_enabled), height=225)
 
 
 # ============================================================================
