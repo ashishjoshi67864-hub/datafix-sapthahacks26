@@ -2,8 +2,10 @@
 
 > **SAPTHAHACKS'26 — INNOVEDGE PS 01**  
 > **Team:** Utsava V, Ashish Joshi, Utsav Panduranga, Vanaja Y  
-> **Status:** 100% Complete • 56/56 Pytest Verification Suite Passing • Judge Ready
+> **Status:** 100% Complete • 56/56 Pytest Verification Suite Passing • Judge Ready  
+> **🌐 Public Live Demo:** [https://datafix-sapthahacks26-tcb47qn829j8ufjvcviwcv.streamlit.app/](https://datafix-sapthahacks26-tcb47qn829j8ufjvcviwcv.streamlit.app/)
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit%20Cloud-FF4B4B.svg?logo=streamlit&logoColor=white)](https://datafix-sapthahacks26-tcb47qn829j8ufjvcviwcv.streamlit.app/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Pydantic v2](https://img.shields.io/badge/Pydantic-v2.6.1-E92063.svg?logo=pydantic&logoColor=white)](https://docs.pydantic.dev)
@@ -100,6 +102,15 @@ DataFix was evaluated across 4 multi-domain benchmark datasets representing ente
 | **`10k_synthetic.csv`** | Scale & SLA Stress Test | 10,050 | 10,000 | 50 | 349 | 0 | 349 | 0 | 99.04% | **100.0%** | <span style="color:green">**+0.96%**</span> |
 
 > **Audit Guarantee:** In all benchmarks, zero protected identifiers were modified, zero non-duplicate valid rows were dropped, and all original 0-based row indices were preserved exactly. The 10,050-row stress test completed in **2.11 seconds (4,770 rows/second)**, beating the 10-second SLA.
+
+---
+
+## 🌐 Live Deployment & Interactive Access
+
+Access the hosted live workbench directly in your browser without local installation:
+
+- **Streamlit Community Cloud:** [https://datafix-sapthahacks26-tcb47qn829j8ufjvcviwcv.streamlit.app/](https://datafix-sapthahacks26-tcb47qn829j8ufjvcviwcv.streamlit.app/)
+- **Live Cloudflare Mirror:** [https://efficiently-llc-thomson-horizontal.trycloudflare.com](https://efficiently-llc-thomson-horizontal.trycloudflare.com)
 
 ---
 
