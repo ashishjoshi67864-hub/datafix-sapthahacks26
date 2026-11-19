@@ -1,0 +1,16 @@
+﻿Patient_ID,Patient_Name,Age,Gender,City,Pincode,Admission_Date,Department,Bill_Amount
+P1001,  arjun sharma ,34,M,Bengaluru,560001,12/08/2026,Cardiology,18500
+P1002,Priya Nair,29,F,,560038,2026-08-13,Orthopedics,12400
+P1003,Rohan Verma,245,M,bengaluru,560076,14-08-2026,Neurology,31000
+P1004,Ananya Rao,41,F,Bengaluru,560043,Aug 15 2026,General Medicine,-4500
+P1005,Vikram   Reddy,52,M,,560066,2026/08/16,Cardiology,27800
+P1005,Vikram   Reddy,52,M,,560066,2026/08/16,Cardiology,27800
+P1006,Sneha Kulkarni,31,F,BENGALURU,560010,17/08/2026,Dermatology,
+P1007,Arjun Shrama,34,M,Bengaluru,560001,2026-08-12,Cardiology,18500
+P1008,Karthik Gowda,-19,M,,560057,18/08/2026,ENT,6200
+P1009,meera iyer,63,F,Bengaluru,560004,2026-08-19,Oncology,54000
+P1010,Deepak Joshi,47,M,Bengaluru,560038,20/08/2026,Orthopedics,0
+P1011,  kavya menon,26,F,,560001,2026-08-21,Pediatrics,3900
+P1012,Suresh Babu,158,M,bengaluru,560076,22-08-2026,Cardiology,21500
+P1013,Priya Nair,29,F,Bengaluru,560038,2026-08-13,Orthopedics,12400
+P1014,Nikhil Desai,38,M,,560043,23/08/2026,Neurology,-15200

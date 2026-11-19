@@ -1,0 +1,11 @@
+﻿Order_ID,Customer_Name,Email,City,Pincode,Order_Date,Category,Quantity,Order_Amount
+ORD-501,  rahul deshmukh ,rahul.d@example.com,Bengaluru,560001,01/11/2026,electronics,1,45999
+ORD-502,Nandini Bhat,nandini.bhat@example.com,,560038,2026-11-02,Home & Kitchen,2,3499
+ORD-503,Aditya Kulkarni,aditya.k@example.com,bengaluru,560066,03-11-2026,ELECTRONICS,-1,12999
+ORD-504,Divya Shetty,divya.shetty@example.com,Bengaluru,560076,Nov 04 2026,Fashion,3,2850
+ORD-504,Divya Shetty,divya.shetty@example.com,Bengaluru,560076,Nov 04 2026,Fashion,3,2850
+ORD-505,Rahul Deshmukh,rahul.d@example.com,Bengaluru,560001,2026-11-01,Electronics,1,45999
+ORD-506,  pooja hegde,pooja.h@example.com,,560043,05/11/2026,Beauty,2,-899
+ORD-507,Manoj Kumar,manoj.k@example.com,BENGALURU,560057,2026/11/06,Electronics,1,
+ORD-508,Shreya Nair,shreya.nair@example.com,Bengaluru,560010,07/11/2026,  home & kitchen ,4,5200
+ORD-509,Varun Hegde,varun.h@example.com,,560004,2026-11-08,Fashion,1,1799
