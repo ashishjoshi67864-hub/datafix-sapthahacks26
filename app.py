@@ -88,12 +88,12 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
         to { stroke-dashoffset: -32; }
     }
     @keyframes pulseGlow {
-        0%, 100% { opacity: 0.35; filter: drop-shadow(0 0 2px #00D59B); }
-        50% { opacity: 1; filter: drop-shadow(0 0 8px #00D59B); }
+        0%, 100% { opacity: 0.35; filter: drop-shadow(0 0 2px #4F46E5); }
+        50% { opacity: 1; filter: drop-shadow(0 0 6px #4F46E5); }
     }
     @keyframes pulseShield {
-        0%, 100% { stroke: #818CF8; opacity: 0.55; }
-        50% { stroke: #A5B4FC; opacity: 0.95; }
+        0%, 100% { stroke: #4F46E5; opacity: 0.55; }
+        50% { stroke: #6366F1; opacity: 0.95; }
     }
     .flow-line {
         stroke-dasharray: 6 6;
@@ -108,7 +108,7 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
     """ if motion_enabled else """
     .flow-line { stroke-dasharray: none; }
     .pulse-dot { opacity: 0.7; }
-    .shield-box { stroke: #818CF8; opacity: 0.7; }
+    .shield-box { stroke: #4F46E5; opacity: 0.7; }
     """
 
     return f"""
@@ -119,8 +119,8 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
     <style>
       body {{ margin: 0; padding: 0; background: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }}
       {anim_css}
-      .stage-title {{ font-size: 11px; font-weight: 700; fill: #0F172A; letter-spacing: 0.5px; }}
-      .stage-sub {{ font-size: 9px; fill: #64748B; }}
+      .stage-title {{ font-size: 12px; font-weight: 800; fill: #0F172A; letter-spacing: 0.5px; }}
+      .stage-sub {{ font-size: 10px; fill: #475569; font-weight: 500; }}
       .node-rect {{ rx: 8px; ry: 8px; }}
     </style>
     </head>
@@ -130,12 +130,12 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
       <rect width="920" height="200" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
 
       <!-- Header Label -->
-      <text x="30" y="28" fill="#4F46E5" font-size="11" font-weight="700" letter-spacing="1">NEURO-SYMBOLIC PIPELINE ARCHITECTURE (6-STAGE WORKFLOW)</text>
-      <text x="30" y="44" fill="#64748B" font-size="10">Deterministic Python cleaning engines paired with metadata-only local AI detective</text>
+      <text x="30" y="28" fill="#4F46E5" font-size="12" font-weight="800" letter-spacing="1">NEURO-SYMBOLIC PIPELINE ARCHITECTURE (6-STAGE WORKFLOW)</text>
+      <text x="30" y="44" fill="#64748B" font-size="11">Deterministic Python cleaning engines paired with metadata-only local AI detective</text>
 
       <!-- Stage 2 Privacy Shield Box -->
       <rect class="shield-box" x="180" y="58" width="135" height="102" rx="10" fill="rgba(79, 70, 229, 0.04)" stroke="#6366F1" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <text x="247" y="172" fill="#4F46E5" font-size="9" font-weight="600" text-anchor="middle">Zero Raw-Row PII to LLM</text>
+      <text x="247" y="172" fill="#4F46E5" font-size="10" font-weight="700" text-anchor="middle">Zero Raw-Row PII to LLM</text>
 
       <!-- Connector Lines with flowing dash -->
       <line class="flow-line" x1="135" y1="105" x2="190" y2="105" stroke="#4F46E5" stroke-width="2"/>
@@ -310,20 +310,20 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
         background-color: #F8FAFC;
         border: 1px solid #E2E8F0;
         border-radius: 8px;
-        padding: 10px 12px;
+        padding: 12px 14px;
       }}
-      .kpi-title {{ font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 3px; }}
-      .kpi-val {{ font-size: 20px; font-weight: 800; color: #0F172A; }}
-      .kpi-sub {{ font-size: 9px; color: #94A3B8; margin-top: 2px; }}
+      .kpi-title {{ font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 4px; }}
+      .kpi-val {{ font-size: 26px; font-weight: 800; color: #0F172A; line-height: 1.1; }}
+      .kpi-sub {{ font-size: 11px; color: #64748B; margin-top: 3px; font-weight: 500; }}
       .delta-pill {{
         background: rgba(79, 70, 229, 0.08);
         color: #4F46E5;
         border: 1px solid rgba(79, 70, 229, 0.25);
         border-radius: 20px;
-        padding: 4px 10px;
-        font-size: 11px;
+        padding: 5px 12px;
+        font-size: 12px;
         font-weight: 700;
-        margin-top: 4px;
+        margin-top: 6px;
         display: inline-block;
       }}
       .provenance-bar {{
@@ -333,7 +333,7 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
         display: flex;
         align-items: center;
         justify-content: space-between;
-        font-size: 10px;
+        font-size: 12px;
         color: #64748B;
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       }}
@@ -341,9 +341,10 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
         background: {'rgba(79, 70, 229, 0.1)' if not is_stage1_only else 'rgba(245, 158, 11, 0.1)'};
         color: {'#4F46E5' if not is_stage1_only else '#D97706'};
         border: 1px solid {'rgba(79, 70, 229, 0.25)' if not is_stage1_only else 'rgba(245, 158, 11, 0.25)'};
-        padding: 2px 8px;
+        padding: 3px 10px;
         border-radius: 4px;
         font-weight: 700;
+        font-size: 11px;
       }}
       @keyframes flowDash {{
         to {{ stroke-dashoffset: -24; }}
@@ -368,8 +369,8 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
             <!-- After Health Arc (Indigo) -->
             <circle cx="65" cy="65" r="52" fill="none" stroke="#4F46E5" stroke-width="10" stroke-dasharray="{circumference}" stroke-dashoffset="{after_offset}" stroke-linecap="round" transform="rotate(-90 65 65)"/>
             <!-- Center Text -->
-            <text x="65" y="60" text-anchor="middle" fill="#0F172A" font-size="20" font-weight="800" id="health-num">{after_score:.2f}%</text>
-            <text x="65" y="76" text-anchor="middle" fill="#64748B" font-size="9" font-weight="600" letter-spacing="0.5">HEALTH SCORE</text>
+            <text x="65" y="60" text-anchor="middle" fill="#0F172A" font-size="26" font-weight="800" id="health-num">{after_score:.2f}%</text>
+            <text x="65" y="76" text-anchor="middle" fill="#64748B" font-size="11" font-weight="700" letter-spacing="0.5">HEALTH SCORE</text>
           </svg>
           <div class="delta-pill">+{delta:.2f} pts Health Delta</div>
         </div>
@@ -379,39 +380,39 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
           <svg width="100%" height="150" viewBox="0 0 460 150" fill="none">
             <!-- Node 1: Raw Ingest -->
             <rect x="5" y="45" width="80" height="48" rx="6" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
-            <text x="45" y="66" fill="#4F46E5" font-size="10" font-weight="700" text-anchor="middle">RAW INGEST</text>
-            <text x="45" y="80" fill="#64748B" font-size="9" text-anchor="middle">{original_rows} rows</text>
+            <text x="45" y="66" fill="#4F46E5" font-size="11" font-weight="800" text-anchor="middle">RAW INGEST</text>
+            <text x="45" y="80" fill="#64748B" font-size="10" font-weight="500" text-anchor="middle">{original_rows} rows</text>
 
             <!-- Connector 1 -->
             <line class="{flow_line_class}" x1="85" y1="69" x2="115" y2="69" stroke="#4F46E5" stroke-width="2"/>
 
             <!-- Node 2: Stage 1 -->
             <rect x="115" y="45" width="85" height="48" rx="6" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
-            <text x="157" y="66" fill="#4F46E5" font-size="10" font-weight="700" text-anchor="middle">STAGE 1</text>
-            <text x="157" y="80" fill="#64748B" font-size="9" text-anchor="middle">{stage1_repairs} fixes</text>
+            <text x="157" y="66" fill="#4F46E5" font-size="11" font-weight="800" text-anchor="middle">STAGE 1</text>
+            <text x="157" y="80" fill="#64748B" font-size="10" font-weight="500" text-anchor="middle">{stage1_repairs} fixes</text>
 
             <!-- Connector 2 -->
             <line class="{flow_line_class}" x1="200" y1="69" x2="230" y2="69" stroke="#4F46E5" stroke-width="2"/>
 
             <!-- Node 3: KS Drift Guard -->
             <rect x="230" y="45" width="75" height="48" rx="6" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
-            <text x="267" y="66" fill="#4F46E5" font-size="10" font-weight="700" text-anchor="middle">KS GUARD</text>
-            <text x="267" y="80" fill="#10B981" font-size="9" font-weight="600" text-anchor="middle">PASSED</text>
+            <text x="267" y="66" fill="#4F46E5" font-size="11" font-weight="800" text-anchor="middle">KS GUARD</text>
+            <text x="267" y="80" fill="#10B981" font-size="10" font-weight="600" text-anchor="middle">PASSED</text>
 
             <!-- Connector 3 -->
             <line class="{flow_line_class}" x1="305" y1="69" x2="335" y2="69" stroke="{stage2_stroke}" stroke-width="2"/>
 
             <!-- Node 4: Stage 2 AI Detective -->
             <rect x="335" y="45" width="85" height="48" rx="6" fill="#F8FAFC" stroke="{stage2_stroke}" stroke-width="1.5" opacity="{stage2_opacity}"/>
-            <text x="377" y="66" fill="{stage2_stroke}" font-size="10" font-weight="700" text-anchor="middle">STAGE 2 AI</text>
-            <text x="377" y="80" fill="#64748B" font-size="9" text-anchor="middle">{stage2_badge}</text>
+            <text x="377" y="66" fill="{stage2_stroke}" font-size="11" font-weight="800" text-anchor="middle">STAGE 2 AI</text>
+            <text x="377" y="80" fill="#64748B" font-size="10" font-weight="500" text-anchor="middle">{stage2_badge}</text>
 
             <!-- Quarantine Side-Branch -->
             <path d="M 157 93 L 157 122 L 335 122" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="3 3"/>
             <g transform="translate(335, 108)">
               <rect width="115" height="28" rx="5" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.2"/>
-              <text x="10" y="18" fill="#B91C1C" font-size="9" font-weight="700">QUARANTINE:</text>
-              <text x="82" y="18" fill="#DC2626" font-size="9" font-weight="800">{unresolved_count} trapped</text>
+              <text x="10" y="18" fill="#B91C1C" font-size="10" font-weight="700">QUARANTINE:</text>
+              <text x="82" y="18" fill="#DC2626" font-size="10" font-weight="800">{unresolved_count} trapped</text>
             </g>
 
             <!-- Final Cleaned Output Indicator -->
@@ -451,11 +452,11 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
       <!-- Provenance & Latency Footer Bar -->
       <div class="provenance-bar">
         <div>
-          <span style="color: #00D59B; font-weight: 700;">SHA-256 PROVENANCE:</span>
+          <span style="color: #4F46E5; font-weight: 700;">SHA-256 PROVENANCE:</span>
           <span style="margin-left: 8px;">In: {input_sha256[:16]}... -> Out: {output_sha256[:16]}...</span>
         </div>
         <div style="display: flex; gap: 12px; align-items: center;">
-          <span>Latency: <strong style="color: #F1F5F9;">{latency_str}</strong></span>
+          <span>Latency: <strong style="color: #0F172A;">{latency_str}</strong></span>
           <span class="badge-status">{pipeline_status.upper()}</span>
         </div>
       </div>
@@ -544,17 +545,17 @@ def render_ks_meter_html(check: Dict[str, Any], motion_enabled: bool) -> str:
       .ks-meta {{
         display: flex;
         justify-content: space-between;
-        font-size: 10px;
-        color: #64748B;
+        font-size: 12px;
+        color: #475569;
         font-family: ui-monospace, SFMono-Regular, monospace;
       }}
       .status-pill {{
         background: {badge_bg};
         color: {badge_color};
         border: 1px solid {badge_color};
-        padding: 2px 8px;
+        padding: 3px 10px;
         border-radius: 12px;
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
       }}
       {anim_css}
@@ -564,8 +565,8 @@ def render_ks_meter_html(check: Dict[str, Any], motion_enabled: bool) -> str:
     <div class="ks-box">
       <div class="ks-header">
         <div>
-          <strong style="color: #38BDF8; font-size: 13px;">Column: <code>{col}</code></strong>
-          <span style="font-size: 10px; color: #64748B; margin-left: 8px;">Two-Sample Kolmogorov-Smirnov Test</span>
+          <strong style="color: #4F46E5; font-size: 14px;">Column: <code>{col}</code></strong>
+          <span style="font-size: 12px; color: #64748B; margin-left: 8px;">Two-Sample Kolmogorov-Smirnov Test</span>
         </div>
         <span class="status-pill">{badge_text}</span>
       </div>
@@ -575,9 +576,9 @@ def render_ks_meter_html(check: Dict[str, Any], motion_enabled: bool) -> str:
         <div class="needle" title="Observed KS Statistic: {ks_stat:.4f}"></div>
       </div>
       <div class="ks-meta">
-        <span>KS Stat: <strong style="color: #F1F5F9;">{ks_stat:.4f}</strong> (0.00 safe -> 0.30 critical)</span>
-        <span style="color: #F87171;">Threshold: 0.15</span>
-        <span>p-value: <strong style="color: #F1F5F9;">{p_val:.4f}</strong></span>
+        <span>KS Stat: <strong style="color: #0F172A;">{ks_stat:.4f}</strong> (0.00 safe -> 0.30 critical)</span>
+        <span style="color: #DC2626; font-weight: 600;">Threshold: 0.15</span>
+        <span>p-value: <strong style="color: #0F172A;">{p_val:.4f}</strong></span>
       </div>
     </div>
     </body>
@@ -745,10 +746,22 @@ st.markdown(
       /* Executive Clean Light Background */
       .stApp {
         background-color: #F8FAFC !important;
+        color: #0F172A !important;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        color: #0F172A !important;
+        font-weight: 800 !important;
       }
       section[data-testid="stSidebar"] {
         background-color: #E2E8F0 !important;
         border-right: 1px solid #CBD5E1 !important;
+      }
+      section[data-testid="stSidebar"] h1,
+      section[data-testid="stSidebar"] h2,
+      section[data-testid="stSidebar"] h3,
+      section[data-testid="stSidebar"] label {
+        color: #0F172A !important;
+        font-weight: 700 !important;
       }
       .block-container {
         padding-top: 1.25rem !important;
@@ -774,9 +787,9 @@ st.markdown(
         color: #4F46E5;
         border: 1px solid rgba(79, 70, 229, 0.25);
         border-radius: 14px;
-        padding: 3px 10px;
-        font-size: 11px;
-        font-weight: 600;
+        padding: 5px 14px;
+        font-size: 13px;
+        font-weight: 700;
         letter-spacing: 0.3px;
         margin-right: 6px;
         margin-bottom: 6px;
@@ -793,18 +806,20 @@ st.markdown(
         background-color: #EEF2FF;
         color: #4F46E5;
         border: 1px solid #C7D2FE;
-        border-radius: 4px;
-        padding: 2px 7px;
-        font-size: 11px;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 13px;
+        font-weight: 600;
         font-family: ui-monospace, SFMono-Regular, monospace;
         margin: 2px 3px;
       }
       .df-repair-card {
         background-color: #FFFFFF;
         border: 1px solid #E2E8F0;
-        border-radius: 8px;
-        padding: 12px 14px;
-        margin-bottom: 8px;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-bottom: 10px;
+        font-size: 14px;
         box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
         animation: fadeSlideUp 0.3s ease-out;
       }
@@ -812,17 +827,19 @@ st.markdown(
         background-color: rgba(239, 68, 68, 0.12);
         color: #DC2626;
         text-decoration: line-through;
-        padding: 2px 6px;
+        padding: 3px 8px;
         border-radius: 4px;
+        font-size: 13px;
         font-family: ui-monospace, SFMono-Regular, monospace;
       }
       .df-diff-ins {
         background-color: rgba(79, 70, 229, 0.12);
         color: #4F46E5;
         text-decoration: none;
-        padding: 2px 6px;
+        padding: 3px 8px;
         border-radius: 4px;
-        font-weight: 600;
+        font-size: 13px;
+        font-weight: 700;
         font-family: ui-monospace, SFMono-Regular, monospace;
       }
 
@@ -861,8 +878,8 @@ if health_info:
     st.sidebar.markdown(
         """
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <span class="df-pulse-dot" style="background:#00D59B;"></span>
-          <strong style="color:#00D59B;font-size:13px;">FastAPI Backend: Online</strong>
+          <span class="df-pulse-dot" style="background:#10B981;"></span>
+          <strong style="color:#059669;font-size:13px;">FastAPI Backend: Online</strong>
         </div>
         """,
         unsafe_allow_html=True,
@@ -874,8 +891,8 @@ if health_info:
             st.sidebar.markdown(
                 f"""
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span class="df-pulse-dot" style="background:#818CF8;"></span>
-                  <span style="color:#A5B4FC;font-size:12px;"><strong>Ollama Detective:</strong> Ready (<code>{model_name}</code>)</span>
+                  <span class="df-pulse-dot" style="background:#4F46E5;"></span>
+                  <span style="color:#0F172A;font-size:13px;"><strong>Ollama Detective:</strong> Ready (<code>{model_name}</code>)</span>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -939,11 +956,11 @@ st.sidebar.caption("100% Local • Neuro-Symbolic • Zero Raw-Row PII Leakage")
 
 st.markdown(
     """
-    <div style="margin-bottom: 14px;">
-      <h1 style="font-size: 26px; margin: 0; font-weight: 800; color: #F1F5F9; letter-spacing: -0.5px;">
+    <div style="margin-bottom: 20px;">
+      <h1 style="font-size: 34px; margin: 0 0 10px 0; font-weight: 800; color: #0F172A; letter-spacing: -0.8px; line-height: 1.2;">
         DataFix — Neuro-Symbolic Data Quality & Repair Workbench
       </h1>
-      <div style="margin-top: 8px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px;">
         <span class="df-hero-pill">100% Local</span>
         <span class="df-hero-pill">Zero Raw-Row PII to LLM</span>
         <span class="df-hero-pill">Deterministic + Ollama</span>
@@ -1085,7 +1102,7 @@ if st.session_state.pipeline_result:
             motion_enabled=motion_enabled,
             latency=st.session_state.run_latency_seconds,
         ),
-        height=225,
+        height=250,
     )
 
     # Warnings bar
@@ -1119,7 +1136,7 @@ if st.session_state.pipeline_result:
                 type_counts = rep_df["anomaly_type"].value_counts().reset_index()
                 type_counts.columns = ["anomaly_type", "count"]
                 chart_spec_type = {
-                    "mark": {"type": "bar", "cornerRadiusEnd": 4, "color": "#00D59B"},
+                    "mark": {"type": "bar", "cornerRadiusEnd": 4, "color": "#4F46E5"},
                     "encoding": {
                         "x": {"field": "count", "type": "quantitative", "title": "Repairs Count"},
                         "y": {"field": "anomaly_type", "type": "nominal", "sort": "-x", "title": "Anomaly Type"},
@@ -1128,7 +1145,7 @@ if st.session_state.pipeline_result:
                     "background": "transparent",
                     "config": {
                         "view": {"stroke": "transparent"},
-                        "axis": {"labelColor": "#94A3B8", "titleColor": "#E2E8F0", "gridColor": "rgba(255,255,255,0.06)"},
+                        "axis": {"labelColor": "#475569", "titleColor": "#0F172A", "gridColor": "#E2E8F0", "titleFontSize": 12, "labelFontSize": 11},
                     },
                 }
                 st.vega_lite_chart(type_counts, chart_spec_type, use_container_width=True)
@@ -1146,7 +1163,7 @@ if st.session_state.pipeline_result:
                             "type": "nominal",
                             "scale": {
                                 "domain": ["auto_safe", "review_recommended", "quarantined"],
-                                "range": ["#00D59B", "#F59E0B", "#EF4444"],
+                                "range": ["#10B981", "#F59E0B", "#EF4444"],
                             },
                             "legend": None,
                         },
@@ -1155,7 +1172,7 @@ if st.session_state.pipeline_result:
                     "background": "transparent",
                     "config": {
                         "view": {"stroke": "transparent"},
-                        "axis": {"labelColor": "#94A3B8", "titleColor": "#E2E8F0", "gridColor": "rgba(255,255,255,0.06)"},
+                        "axis": {"labelColor": "#475569", "titleColor": "#0F172A", "gridColor": "#E2E8F0", "titleFontSize": 12, "labelFontSize": 11},
                     },
                 }
                 st.vega_lite_chart(tier_counts, chart_spec_tier, use_container_width=True)
@@ -1175,7 +1192,7 @@ if st.session_state.pipeline_result:
                     st.markdown(
                         f"""
                         <div style="display:flex;justify-content:space-between;align-items:center;">
-                          <h4 style="margin:0;color:#F1F5F9;"><span style="color:#818CF8;">[{c_id}]</span> {cause}</h4>
+                          <h4 style="margin:0;color:#0F172A;font-weight:700;"><span style="color:#4F46E5;">[{c_id}]</span> {cause}</h4>
                           <span class="df-hero-pill" style="margin:0;">{affected_rows} rows impacted</span>
                         </div>
                         """,
@@ -1197,7 +1214,7 @@ if st.session_state.pipeline_result:
         ks_checks = quality_report.get("ks_drift_checks", [])
         if ks_checks:
             for check in ks_checks:
-                components.html(render_ks_meter_html(check, motion_enabled), height=95)
+                components.html(render_ks_meter_html(check, motion_enabled), height=115)
         else:
             st.info("No numeric columns required KS drift verification.")
 
@@ -1280,16 +1297,16 @@ if st.session_state.pipeline_result:
                             <div>
                               <span class="df-chip">Row #{r_idx}</span>
                               <span class="df-chip">{r_col}</span>
-                              <span class="df-chip" style="color:#818CF8;">{r_stage}</span>
+                              <span class="df-chip" style="color:#4F46E5;">{r_stage}</span>
                             </div>
                             <span class="df-hero-pill" style="margin:0;">{r_conf:.2f} ({r_tier})</span>
                           </div>
-                          <div style="margin:8px 0;font-size:13px;">
+                          <div style="margin:8px 0;font-size:14px;">
                             <del class="df-diff-del">{r_orig}</del>
-                            <span style="color:#94A3B8;margin:0 8px;font-weight:600;">-></span>
+                            <span style="color:#64748B;margin:0 8px;font-weight:600;">-></span>
                             <ins class="df-diff-ins">{r_corr}</ins>
                           </div>
-                          <div style="font-size:11px;color:#94A3B8;">Reason: {r_reason}</div>
+                          <div style="font-size:12px;color:#64748B;">Reason: {r_reason}</div>
                         </div>
                         """,
                         unsafe_allow_html=True,
