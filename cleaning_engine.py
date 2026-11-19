@@ -773,7 +773,16 @@ def run_stage1_cleaning(df: pd.DataFrame) -> Stage1Result:
     # Low cardinality distributions (categorical columns with <= 30 unique non-null values)
     low_card_dist: Dict[str, Dict[str, int]] = {}
     for col in cleaned_df.columns:
-        if col not in numeric_cols and col not in all_null_numeric_cols and col not in date_cols:
+        col_lower = str(col).lower()
+        tokens = [t.lower() for t in re.split(r"[\s_\-]+", col_lower) if t]
+        is_name = any(t in ["name", "fname", "lname", "first_name", "last_name"] for t in tokens)
+        if (
+            col not in numeric_cols
+            and col not in all_null_numeric_cols
+            and col not in date_cols
+            and col not in protected_cols
+            and not is_name
+        ):
             non_null_vals = [str(v) for v in cleaned_df[col] if not pd.isna(v) and str(v).strip() != ""]
             unique_vals = set(non_null_vals)
             if 0 < len(unique_vals) <= 30:
