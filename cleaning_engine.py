@@ -111,12 +111,12 @@ def load_csv(source: Union[str, Path, bytes, BinaryIO, TextIO]) -> pd.DataFrame:
     """
     if isinstance(source, (str, Path)):
         try:
-            df = pd.read_csv(source, dtype=str, keep_default_na=False, encoding="utf-8")
+            df = pd.read_csv(source, dtype=str, keep_default_na=False, encoding="utf-8-sig")
         except UnicodeDecodeError:
             df = pd.read_csv(source, dtype=str, keep_default_na=False, encoding="latin-1")
     elif isinstance(source, bytes):
         try:
-            df = pd.read_csv(io.BytesIO(source), dtype=str, keep_default_na=False, encoding="utf-8")
+            df = pd.read_csv(io.BytesIO(source), dtype=str, keep_default_na=False, encoding="utf-8-sig")
         except UnicodeDecodeError:
             df = pd.read_csv(io.BytesIO(source), dtype=str, keep_default_na=False, encoding="latin-1")
     else:

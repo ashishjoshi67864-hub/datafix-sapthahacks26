@@ -1,15 +1,15 @@
 # 🛠️ DataFix — 100% Local Neuro-Symbolic Tabular Data Quality Workbench
 
 > **SAPTHAHACKS'26 — INNOVEDGE PS 01**  
-> **Team:** Utsava V, Ashish Joshi, Utsav Panduranga, Vanja Y  
-> **Status:** 100% Complete • 44/44 Pytest Verification Suite Passing • Judge Ready
+> **Team:** Utsava V, Ashish Joshi, Utsav Panduranga, Vanaja Y  
+> **Status:** 100% Complete • 48/48 Pytest Verification Suite Passing • Judge Ready
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Pydantic v2](https://img.shields.io/badge/Pydantic-v2.6.1-E92063.svg?logo=pydantic&logoColor=white)](https://docs.pydantic.dev)
 [![Ollama](https://img.shields.io/badge/Ollama-qwen2.5:3b-black.svg?logo=ollama&logoColor=white)](https://ollama.ai)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Pytest-44%20Passed-brightgreen.svg)](https://pytest.org)
+[![Tests](https://img.shields.io/badge/Pytest-48%20Passed-brightgreen.svg)](https://pytest.org)
 
 ---
 
@@ -22,7 +22,7 @@ Modern enterprise data pipelines are plagued by dirty tabular data: malformed HT
 3. **Statistical Distortion:** Arbitrary LLM or mean imputations skew underlying probability distributions, invalidating downstream machine learning models.
 
 **DataFix solves this with a 100% local, neuro-symbolic architecture:**
-- **Symbolic Muscle (Deterministic Python):** Profiles datasets, enforces strict protected identifier boundaries, executes HTML/whitespace stripping, handles exact deduplication while preserving original 0-based indices, computes safe median/IQR numeric imputations, and statistically validates changes with a **Kolmogorov-Smirnov (KS) drift test** that triggers automatic rollback upon distribution divergence.
+- **Symbolic Muscle (Deterministic Python):** Profiles datasets, enforces strict protected identifier boundaries, executes HTML/whitespace stripping, handles exact deduplication while preserving original 0-based indices, computes safe **KNN (K-Nearest Neighbours) numeric imputations** (scaled via `StandardScaler` + `KNNImputer`), and statistically validates changes with a **Kolmogorov-Smirnov (KS) drift test** that triggers automatic rollback upon distribution divergence.
 - **Neural Advisory (Local LLM Detective):** Runs locally via Ollama (`qwen2.5:3b`). The LLM **never** sees raw dataset rows—it receives only aggregated value frequencies and error counts. Every proposal is gated by strict Pydantic `extra="forbid"` contracts and verified against observed domain sets before any mutation occurs. If Ollama is offline or uninstalled, DataFix falls back seamlessly to deterministic heuristics with zero downtime.
 
 ---
@@ -46,8 +46,8 @@ Modern enterprise data pipelines are plagued by dirty tabular data: malformed HT
 │  1. Identifier Protection     : Auto-detects & freezes customer_id, phone, postal_code │
 │  2. Deterministic Cleaning    : Regex HTML tag stripping & whitespace normalization   │
 │  3. Exact Deduplication       : Drops identical rows while maintaining row indices    │
-│  4. Safe Numeric Imputation   : Median/IQR imputation on non-protected numeric fields  │
-│  5. KS-Test Drift Rollback    : Reverts numeric imputations if p-value < 0.05         │
+│  4. Safe Numeric Imputation   : Scaled KNN imputation (StandardScaler + KNNImputer) on non-protected numeric fields │
+│  5. KS-Test Drift Rollback    : Reverts numeric imputations if distribution drift detected (p-value < 0.05 or KS > 0.15) │
 └───────────────────────────────────────────┬───────────────────────────────────────────┘
                                             │
                                   Post-Stage 1 Clean DF
@@ -173,7 +173,7 @@ streamlit run app.py
 
 ### Step 3: Run the Automated Verification Suite
 
-Run all 44 unit and integration tests across schemas, Stage 1 engine, KS statistical drift, Stage 2 AI guardrails, FastAPI endpoints, and Streamlit AST safety:
+Run all 48 unit and integration tests across schemas, Stage 1 engine, KS statistical drift, Stage 2 AI guardrails, FastAPI endpoints, Streamlit AST safety, reproducibility, idempotency, UTF-8 BOM handling, and clean-CSV guards:
 
 ```bash
 # Windows
@@ -185,7 +185,7 @@ python -m pytest -v
 
 **Expected output:**
 ```text
-======================= 44 passed, 5 warnings in 7.43s =======================
+======================= 48 passed in ~8s =======================
 ```
 
 ---
@@ -277,6 +277,6 @@ Built with pride for **SAPTHAHACKS'26** (INNOVEDGE PS 01):
 - **Utsava V**
 - **Ashish Joshi**
 - **Utsav Panduranga**
-- **Vanja Y**
+- **Vanaja Y**
 
 *DataFix — Autonomous, Neuro-Symbolic, 100% Local Data Quality Engineering.*

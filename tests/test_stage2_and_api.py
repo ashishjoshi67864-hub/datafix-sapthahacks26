@@ -521,3 +521,112 @@ def test_frontend_thin_client_ast_and_render():
         at = AppTest.from_file("app.py").run()
 
     assert len(at.exception) == 0, f"AppTest rendered with exceptions: {at.exception}"
+
+
+
+# ============================================================================
+# e) Reproducibility, Idempotency, Clean-CSV, and UTF-8 BOM Tests
+# ============================================================================
+
+def test_pipeline_exact_reproducibility_sha256():
+    """Running run_datafix_pipeline twice on sample_dirty.csv (deterministic) produces
+    identical input_sha256, output_sha256, cleaned_csv, and total repair count.
+    """
+    csv_bytes = SAMPLE_DIRTY_PATH.read_bytes()
+
+    result1 = run_datafix_pipeline(csv_bytes, filename="sample_dirty.csv", llm_mode="deterministic")
+    result2 = run_datafix_pipeline(csv_bytes, filename="sample_dirty.csv", llm_mode="deterministic")
+
+    assert result1.quality_report.input_sha256 == result2.quality_report.input_sha256, \
+        "Input SHA-256 must be identical across two runs of the same input"
+    assert result1.quality_report.output_sha256 == result2.quality_report.output_sha256, \
+        "Output SHA-256 must be identical (deterministic output)"
+    assert result1.cleaned_csv == result2.cleaned_csv, \
+        "Cleaned CSV content must be byte-for-byte identical across two deterministic runs"
+    assert result1.summary.total_repairs == result2.summary.total_repairs, \
+        "Total repair count must be identical across two deterministic runs"
+
+
+def test_pipeline_already_clean_csv_zero_corruption():
+    """Passing a perfectly clean CSV produces 0 repairs, 0 unresolved, 0 duplicates,
+    before_health_score == after_health_score == 100.0, and no cell value is altered.
+    """
+    clean_csv = "customer_id,name,city,age\n101,Alice,Mumbai,30\n102,Bob,Delhi,25\n103,Carol,Chennai,35\n"
+    csv_bytes = clean_csv.encode("utf-8")
+
+    result = run_datafix_pipeline(csv_bytes, filename="clean.csv", llm_mode="deterministic")
+
+    assert result.summary.total_repairs == 0, \
+        f"Expected 0 repairs on a clean CSV, got {result.summary.total_repairs}"
+    assert result.summary.unresolved_count == 0, \
+        f"Expected 0 unresolved issues on a clean CSV, got {result.summary.unresolved_count}"
+    assert result.summary.duplicates_removed == 0, \
+        f"Expected 0 duplicates on a clean CSV, got {result.summary.duplicates_removed}"
+    assert result.quality_report.before_health_score == 100.0, \
+        f"Expected before_health_score=100.0, got {result.quality_report.before_health_score}"
+    assert result.quality_report.after_health_score == 100.0, \
+        f"Expected after_health_score=100.0, got {result.quality_report.after_health_score}"
+
+    # Verify no cell values were altered
+    import io
+    cleaned_df = pd.read_csv(io.StringIO(result.cleaned_csv), dtype=str)
+    original_df = pd.read_csv(io.StringIO(clean_csv), dtype=str)
+    assert cleaned_df.shape == original_df.shape, "Shape must not change on a clean CSV"
+    for col in original_df.columns:
+        for idx in original_df.index:
+            assert str(original_df.at[idx, col]) == str(cleaned_df.at[idx, col]), \
+                f"Cell [{idx}, {col}] was unexpectedly mutated on a clean CSV"
+
+
+def test_pipeline_idempotency_on_reclean():
+    """Re-running run_datafix_pipeline on the cleaned_csv output of sample_dirty.csv
+    introduces 0 new repairs, proving DataFix never over-mutates already-repaired data.
+    """
+    import io as _io
+    csv_bytes = SAMPLE_DIRTY_PATH.read_bytes()
+
+    # First pass
+    result1 = run_datafix_pipeline(csv_bytes, filename="sample_dirty.csv", llm_mode="deterministic")
+    cleaned_bytes = result1.cleaned_csv.encode("utf-8")
+
+    # Second pass on the already-cleaned output
+    result2 = run_datafix_pipeline(cleaned_bytes, filename="cleaned.csv", llm_mode="deterministic")
+
+    assert result2.summary.total_repairs == 0, (
+        f"Idempotency violation: re-cleaning an already-cleaned CSV introduced "
+        f"{result2.summary.total_repairs} new repairs: "
+        f"{[(r.column, r.original_value, r.corrected_value) for r in result2.repairs[:5]]}"
+    )
+    assert result2.summary.duplicates_removed == 0, \
+        f"Re-cleaning introduced unexpected duplicate removal: {result2.summary.duplicates_removed}"
+
+
+def test_pipeline_utf8_bom_excel_csv():
+    """Passing a UTF-8 BOM (EF BB BF) Excel-exported CSV strips the BOM cleanly
+    so that identifier detection (customer_id) and repairs work identically to
+    the BOM-free equivalent.
+    """
+    # Build identical CSV content with and without BOM
+    base_csv = "customer_id,name,city,age\n101,Alice,Mumbai,30\n102,Bob,  Delhi  ,25\n103,Carol,Mumbai,35\n"
+    bom_csv_bytes = b"\xef\xbb\xbf" + base_csv.encode("utf-8")
+    plain_csv_bytes = base_csv.encode("utf-8")
+
+    result_bom = run_datafix_pipeline(bom_csv_bytes, filename="excel_export.csv", llm_mode="deterministic")
+    result_plain = run_datafix_pipeline(plain_csv_bytes, filename="plain.csv", llm_mode="deterministic")
+
+    # BOM must be stripped: first column must be "customer_id", not "\ufeffcustomer_id"
+    assert "customer_id" in result_bom.summary.columns, (
+        f"BOM not stripped: columns are {result_bom.summary.columns}"
+    )
+    bom_col = next((c for c in result_bom.summary.columns if "\ufeff" in c), None)
+    assert bom_col is None, f"BOM character still present in column name: {bom_col!r}"
+
+    # Protected identifier detection must work identically regardless of BOM
+    assert "customer_id" in result_bom.summary.protected_identifier_columns, \
+        "customer_id must be detected as protected identifier even from BOM CSV"
+
+    # Repair counts must be identical (BOM should not affect cleaning logic)
+    assert result_bom.summary.total_repairs == result_plain.summary.total_repairs, (
+        f"Repair count differs between BOM ({result_bom.summary.total_repairs}) "
+        f"and plain ({result_plain.summary.total_repairs}) CSV"
+    )
