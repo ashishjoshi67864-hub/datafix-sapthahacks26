@@ -1,0 +1,5 @@
+record_id,label,score,all_null_metric
+1001,"  <b>Alpha</b>  ",85.5,
+,<i>Beta Item</i>,92.0,
+1003,"  Gamma   Product  ",,
+1004,Delta Normal,78.0,

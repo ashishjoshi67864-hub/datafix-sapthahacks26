@@ -1,0 +1,25 @@
+customer_id,name,phone,postal_code,city,department,age,salary
+101,Aarav Sharma,9876543210,560001,Bengaluru,Engineering,29,75000
+102,Diya Patel,9876543211,400001,Mumbai,Marketing,34,68000
+103,"  Rohan   Mehta  ",9876543212,560001,BLR,<span>Engineering</span>,30,72000
+104,Kavita Krishnan,9876543213,560001,Bengaluru,Finance,41,88000
+105,Arjun Singh,9876543214,560001,"  Bengaluru ",Enginering," 31 ",73000
+106,<b>Vikram Malhotra</b>,9876543215,560001,Banglore,Operations,35,
+107,Rahul Verma,9876543216,110001,Delhi,Engineering,27,62000
+108,Sneha Rao,9876543217,560001,Bengaluru,Operations,38,71000
+101,Aarav Sharma,9876543210,560001,Bengaluru,Engineering,29,75000
+110,Neha Gupta,,400001,Mumbay,Finance,,"72000.0"
+111,Pooja Hegde,9876543220,400001,Mumbai,Finance,31,69000
+112,Amitabh Sen,9876543221,110001,Delhi,Engineering,45,92000
+113,<i>Priya Nair</i>,9876543222,560001,,"  Marketing   ",33,74000
+114,Rajesh Pillai,9876543223,400001,BOM,Markting,42,
+115,Sunita Pillai,9876543224,560001,Bengaluru,Marketing,36,74000
+116,Nikhil Reddy,9876543225,400001,Mumbai,Finance,-35,70000
+104,Kavita Krishnan,9876543213,560001,Bengaluru,Finance,41,88000
+118,Deepak Joshi,9876543227,400001,Mumbai,Operations,42,83000
+119,Meera Iyer,9876543228,110001,Delhi,Finance,28,58000
+120,Sanjay Saxena,9876543229,,New Dehli,Operations,37,77000
+121,Kiran Kulkarni,9876543230,560001,Bengaluru,Engineering,33,79000
+122,Ritu Bhatia,9876543231,400001,,Finanse,,65000
+123," Ananya  Deshmukh ",9876543232,,,,26,55000
+124,Suresh Menon,9876543233,110001,Delhi,Operations,39,76000
