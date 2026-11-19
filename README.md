@@ -110,7 +110,6 @@ DataFix was evaluated across 4 multi-domain benchmark datasets representing ente
 Access the hosted live workbench directly in your browser without local installation:
 
 - **Streamlit Community Cloud:** [https://datafix-sapthahacks26-tcb47qn829j8ufjvcviwcv.streamlit.app/](https://datafix-sapthahacks26-tcb47qn829j8ufjvcviwcv.streamlit.app/)
-- **Live Cloudflare Mirror:** [https://efficiently-llc-thomson-horizontal.trycloudflare.com](https://efficiently-llc-thomson-horizontal.trycloudflare.com)
 
 ---
 
