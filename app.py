@@ -33,7 +33,7 @@ st.set_page_config(
 # ============================================================================
 
 @st.cache_resource
-def ensure_backend_alive():
+def start_backend():
     """Ensures FastAPI backend is active; auto-starts uvicorn daemon if offline."""
     if os.getenv("STREAMLIT_TESTING") or os.getenv("PYTEST_CURRENT_TEST"):
         return
@@ -51,10 +51,11 @@ def ensure_backend_alive():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
-        for _ in range(15):
-            time.sleep(0.2)
+        # Give Uvicorn up to 15 seconds to boot cleanly before rendering the UI
+        for _ in range(60):
+            time.sleep(0.25)
             try:
-                with urllib.request.urlopen("http://127.0.0.1:8000/health", timeout=0.2) as resp:
+                with urllib.request.urlopen("http://127.0.0.1:8000/health", timeout=0.25) as resp:
                     if resp.status == 200:
                         break
             except Exception:
@@ -62,7 +63,8 @@ def ensure_backend_alive():
     except Exception as e:
         print(f"DataFix backend auto-spawn note: {e}", file=sys.stderr)
 
-ensure_backend_alive()
+start_backend()
+ensure_backend_alive = start_backend
 
 # ============================================================================
 # Session State Initialization
