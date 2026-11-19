@@ -119,36 +119,36 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
     <style>
       body {{ margin: 0; padding: 0; background: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }}
       {anim_css}
-      .stage-title {{ font-size: 11px; font-weight: 700; fill: #F1F5F9; letter-spacing: 0.5px; }}
-      .stage-sub {{ font-size: 9px; fill: #94A3B8; }}
+      .stage-title {{ font-size: 11px; font-weight: 700; fill: #0F172A; letter-spacing: 0.5px; }}
+      .stage-sub {{ font-size: 9px; fill: #64748B; }}
       .node-rect {{ rx: 8px; ry: 8px; }}
     </style>
     </head>
     <body>
     <svg width="100%" height="205" viewBox="0 0 920 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- Dark backdrop card -->
-      <rect width="920" height="200" rx="12" fill="#0B1120" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+      <!-- Backdrop card -->
+      <rect width="920" height="200" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
 
       <!-- Header Label -->
-      <text x="30" y="28" fill="#10B981" font-size="11" font-weight="700" letter-spacing="1">NEURO-SYMBOLIC PIPELINE ARCHITECTURE (6-STAGE WORKFLOW)</text>
+      <text x="30" y="28" fill="#4F46E5" font-size="11" font-weight="700" letter-spacing="1">NEURO-SYMBOLIC PIPELINE ARCHITECTURE (6-STAGE WORKFLOW)</text>
       <text x="30" y="44" fill="#64748B" font-size="10">Deterministic Python cleaning engines paired with metadata-only local AI detective</text>
 
       <!-- Stage 2 Privacy Shield Box -->
-      <rect class="shield-box" x="180" y="58" width="135" height="102" rx="10" fill="rgba(129, 140, 248, 0.04)" stroke="#818CF8" stroke-width="1.5" stroke-dasharray="4 4"/>
-      <text x="247" y="172" fill="#A5B4FC" font-size="9" font-weight="600" text-anchor="middle">Zero Raw-Row PII to LLM</text>
+      <rect class="shield-box" x="180" y="58" width="135" height="102" rx="10" fill="rgba(79, 70, 229, 0.04)" stroke="#6366F1" stroke-width="1.5" stroke-dasharray="4 4"/>
+      <text x="247" y="172" fill="#4F46E5" font-size="9" font-weight="600" text-anchor="middle">Zero Raw-Row PII to LLM</text>
 
       <!-- Connector Lines with flowing dash -->
-      <line class="flow-line" x1="135" y1="105" x2="190" y2="105" stroke="#10B981" stroke-width="2"/>
-      <line class="flow-line" x1="305" y1="105" x2="360" y2="105" stroke="#818CF8" stroke-width="2"/>
-      <line class="flow-line" x1="475" y1="105" x2="530" y2="105" stroke="#10B981" stroke-width="2"/>
-      <line class="flow-line" x1="645" y1="105" x2="700" y2="105" stroke="#38BDF8" stroke-width="2"/>
-      <line class="flow-line" x1="815" y1="105" x2="860" y2="105" stroke="#60A5FA" stroke-width="2"/>
+      <line class="flow-line" x1="135" y1="105" x2="190" y2="105" stroke="#4F46E5" stroke-width="2"/>
+      <line class="flow-line" x1="305" y1="105" x2="360" y2="105" stroke="#6366F1" stroke-width="2"/>
+      <line class="flow-line" x1="475" y1="105" x2="530" y2="105" stroke="#4F46E5" stroke-width="2"/>
+      <line class="flow-line" x1="645" y1="105" x2="700" y2="105" stroke="#6366F1" stroke-width="2"/>
+      <line class="flow-line" x1="815" y1="105" x2="860" y2="105" stroke="#4F46E5" stroke-width="2"/>
 
       <!-- Stage 1: DETECT -->
       <g transform="translate(25, 70)">
-        <rect class="node-rect" width="110" height="70" fill="#111827" stroke="#10B981" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#10B981" opacity="0.2"/>
-        <circle cx="20" cy="22" r="2.5" fill="#10B981"/>
+        <rect class="node-rect" width="110" height="70" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
+        <circle cx="20" cy="22" r="5" fill="#4F46E5" opacity="0.15"/>
+        <circle cx="20" cy="22" r="2.5" fill="#4F46E5"/>
         <text class="stage-title" x="32" y="25">1. DETECT</text>
         <text class="stage-sub" x="15" y="44">Stage 1 Profiler</text>
         <text class="stage-sub" x="15" y="57">Nulls, Types, HTML</text>
@@ -156,9 +156,9 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
 
       <!-- Stage 2: DIAGNOSE -->
       <g transform="translate(192, 70)">
-        <rect class="node-rect" width="112" height="70" fill="#111827" stroke="#818CF8" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#818CF8" opacity="0.2"/>
-        <circle cx="20" cy="22" r="2.5" fill="#818CF8"/>
+        <rect class="node-rect" width="112" height="70" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
+        <circle cx="20" cy="22" r="5" fill="#6366F1" opacity="0.15"/>
+        <circle cx="20" cy="22" r="2.5" fill="#6366F1"/>
         <text class="stage-title" x="32" y="25">2. DIAGNOSE</text>
         <text class="stage-sub" x="15" y="44">Ollama Detective</text>
         <text class="stage-sub" x="15" y="57">Counts & Patterns</text>
@@ -166,9 +166,9 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
 
       <!-- Stage 3: REPAIR -->
       <g transform="translate(362, 70)">
-        <rect class="node-rect" width="112" height="70" fill="#111827" stroke="#10B981" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#10B981" opacity="0.2"/>
-        <circle cx="20" cy="22" r="2.5" fill="#10B981"/>
+        <rect class="node-rect" width="112" height="70" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
+        <circle cx="20" cy="22" r="5" fill="#4F46E5" opacity="0.15"/>
+        <circle cx="20" cy="22" r="2.5" fill="#4F46E5"/>
         <text class="stage-title" x="32" y="25">3. REPAIR</text>
         <text class="stage-sub" x="15" y="44">Python Mutator</text>
         <text class="stage-sub" x="15" y="57">Deduplicate & Impute</text>
@@ -176,9 +176,9 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
 
       <!-- Stage 4: VALIDATE -->
       <g transform="translate(532, 70)">
-        <rect class="node-rect" width="112" height="70" fill="#111827" stroke="#38BDF8" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#38BDF8" opacity="0.2"/>
-        <circle cx="20" cy="22" r="2.5" fill="#38BDF8"/>
+        <rect class="node-rect" width="112" height="70" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
+        <circle cx="20" cy="22" r="5" fill="#6366F1" opacity="0.15"/>
+        <circle cx="20" cy="22" r="2.5" fill="#6366F1"/>
         <text class="stage-title" x="32" y="25">4. VALIDATE</text>
         <text class="stage-sub" x="15" y="44">KS Drift Guard</text>
         <text class="stage-sub" x="15" y="57">Auto-Rollback Guard</text>
@@ -186,9 +186,9 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
 
       <!-- Stage 5: EXPLAIN -->
       <g transform="translate(702, 70)">
-        <rect class="node-rect" width="112" height="70" fill="#111827" stroke="#60A5FA" stroke-width="1.5"/>
-        <circle cx="20" cy="22" r="5" fill="#60A5FA" opacity="0.2"/>
-        <circle cx="20" cy="22" r="2.5" fill="#60A5FA"/>
+        <rect class="node-rect" width="112" height="70" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
+        <circle cx="20" cy="22" r="5" fill="#4F46E5" opacity="0.15"/>
+        <circle cx="20" cy="22" r="2.5" fill="#4F46E5"/>
         <text class="stage-title" x="32" y="25">5. EXPLAIN</text>
         <text class="stage-sub" x="15" y="44">Pydantic v2 Contract</text>
         <text class="stage-sub" x="15" y="57">Confidence Tiers</text>
@@ -196,9 +196,9 @@ def render_empty_state_svg(motion_enabled: bool) -> str:
 
       <!-- Stage 6: TRACK badge -->
       <g transform="translate(825, 78)">
-        <circle cx="45" cy="28" r="22" fill="#111827" stroke="#F43F5E" stroke-width="1.5"/>
-        <text x="45" y="25" fill="#F43F5E" font-size="10" font-weight="700" text-anchor="middle">6. TRACK</text>
-        <text x="45" y="37" fill="#94A3B8" font-size="8" text-anchor="middle">SHA-256</text>
+        <circle cx="45" cy="28" r="22" fill="#F8FAFC" stroke="#E11D48" stroke-width="1.5"/>
+        <text x="45" y="25" fill="#E11D48" font-size="10" font-weight="700" text-anchor="middle">6. TRACK</text>
+        <text x="45" y="37" fill="#64748B" font-size="8" text-anchor="middle">SHA-256</text>
       </g>
     </svg>
     </body>
@@ -263,7 +263,7 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
 
     flow_line_class = "flow-pulse" if motion_enabled else ""
 
-    stage2_stroke = "#F59E0B" if is_stage1_only else "#818CF8"
+    stage2_stroke = "#D97706" if is_stage1_only else "#4F46E5"
     stage2_badge = "SKIPPED" if is_stage1_only else f"{stage2_repairs} repairs"
     stage2_opacity = "0.45" if is_stage1_only else "1.0"
 
@@ -274,13 +274,13 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
     <meta charset="utf-8">
     <style>
       * {{ box-sizing: border-box; }}
-      body {{ margin: 0; padding: 0; background: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #F1F5F9; user-select: none; }}
+      body {{ margin: 0; padding: 0; background: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #0F172A; user-select: none; }}
       .telemetry-card {{
-        background-color: #111827;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 12px;
         padding: 16px 20px 14px 20px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
       }}
       .grid-container {{
         display: flex;
@@ -307,18 +307,18 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
         gap: 10px;
       }}
       .kpi-tile {{
-        background-color: #162032;
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        background-color: #F8FAFC;
+        border: 1px solid #E2E8F0;
         border-radius: 8px;
         padding: 10px 12px;
       }}
-      .kpi-title {{ font-size: 10px; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 3px; }}
-      .kpi-val {{ font-size: 20px; font-weight: 800; color: #F1F5F9; }}
-      .kpi-sub {{ font-size: 9px; color: #64748B; margin-top: 2px; }}
+      .kpi-title {{ font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 3px; }}
+      .kpi-val {{ font-size: 20px; font-weight: 800; color: #0F172A; }}
+      .kpi-sub {{ font-size: 9px; color: #94A3B8; margin-top: 2px; }}
       .delta-pill {{
-        background: rgba(0, 213, 155, 0.12);
-        color: #00D59B;
-        border: 1px solid rgba(0, 213, 155, 0.28);
+        background: rgba(79, 70, 229, 0.08);
+        color: #4F46E5;
+        border: 1px solid rgba(79, 70, 229, 0.25);
         border-radius: 20px;
         padding: 4px 10px;
         font-size: 11px;
@@ -329,18 +329,18 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
       .provenance-bar {{
         margin-top: 12px;
         padding-top: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        border-top: 1px solid #E2E8F0;
         display: flex;
         align-items: center;
         justify-content: space-between;
         font-size: 10px;
-        color: #94A3B8;
+        color: #64748B;
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       }}
       .badge-status {{
-        background: {'rgba(0, 213, 155, 0.18)' if not is_stage1_only else 'rgba(245, 158, 11, 0.18)'};
-        color: {'#00D59B' if not is_stage1_only else '#FBBF24'};
-        border: 1px solid {'rgba(0, 213, 155, 0.35)' if not is_stage1_only else 'rgba(245, 158, 11, 0.35)'};
+        background: {'rgba(79, 70, 229, 0.1)' if not is_stage1_only else 'rgba(245, 158, 11, 0.1)'};
+        color: {'#4F46E5' if not is_stage1_only else '#D97706'};
+        border: 1px solid {'rgba(79, 70, 229, 0.25)' if not is_stage1_only else 'rgba(245, 158, 11, 0.25)'};
         padding: 2px 8px;
         border-radius: 4px;
         font-weight: 700;
@@ -362,14 +362,14 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
         <div class="gauge-col">
           <svg width="140" height="140" viewBox="0 0 130 130">
             <!-- Background track -->
-            <circle cx="65" cy="65" r="52" fill="none" stroke="#1E293B" stroke-width="10"/>
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#E2E8F0" stroke-width="10"/>
             <!-- Before Health Arc (Dim Cyan) -->
-            <circle cx="65" cy="65" r="52" fill="none" stroke="#38BDF8" stroke-width="6" stroke-dasharray="{circumference}" stroke-dashoffset="{before_offset}" stroke-linecap="round" opacity="0.3" transform="rotate(-90 65 65)"/>
-            <!-- After Health Arc (Vibrant Emerald) -->
-            <circle cx="65" cy="65" r="52" fill="none" stroke="#00D59B" stroke-width="10" stroke-dasharray="{circumference}" stroke-dashoffset="{after_offset}" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#CBD5E1" stroke-width="6" stroke-dasharray="{circumference}" stroke-dashoffset="{before_offset}" stroke-linecap="round" opacity="0.5" transform="rotate(-90 65 65)"/>
+            <!-- After Health Arc (Indigo) -->
+            <circle cx="65" cy="65" r="52" fill="none" stroke="#4F46E5" stroke-width="10" stroke-dasharray="{circumference}" stroke-dashoffset="{after_offset}" stroke-linecap="round" transform="rotate(-90 65 65)"/>
             <!-- Center Text -->
-            <text x="65" y="60" text-anchor="middle" fill="#F1F5F9" font-size="20" font-weight="800" id="health-num">{after_score:.2f}%</text>
-            <text x="65" y="76" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="600" letter-spacing="0.5">HEALTH SCORE</text>
+            <text x="65" y="60" text-anchor="middle" fill="#0F172A" font-size="20" font-weight="800" id="health-num">{after_score:.2f}%</text>
+            <text x="65" y="76" text-anchor="middle" fill="#64748B" font-size="9" font-weight="600" letter-spacing="0.5">HEALTH SCORE</text>
           </svg>
           <div class="delta-pill">+{delta:.2f} pts Health Delta</div>
         </div>
@@ -378,46 +378,46 @@ def render_hero_telemetry_html(result: Dict[str, Any], motion_enabled: bool, lat
         <div class="flow-col">
           <svg width="100%" height="150" viewBox="0 0 460 150" fill="none">
             <!-- Node 1: Raw Ingest -->
-            <rect x="5" y="45" width="80" height="48" rx="6" fill="#162032" stroke="#38BDF8" stroke-width="1.5"/>
-            <text x="45" y="66" fill="#38BDF8" font-size="10" font-weight="700" text-anchor="middle">RAW INGEST</text>
-            <text x="45" y="80" fill="#94A3B8" font-size="9" text-anchor="middle">{original_rows} rows</text>
+            <rect x="5" y="45" width="80" height="48" rx="6" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
+            <text x="45" y="66" fill="#4F46E5" font-size="10" font-weight="700" text-anchor="middle">RAW INGEST</text>
+            <text x="45" y="80" fill="#64748B" font-size="9" text-anchor="middle">{original_rows} rows</text>
 
             <!-- Connector 1 -->
-            <line class="{flow_line_class}" x1="85" y1="69" x2="115" y2="69" stroke="#00D59B" stroke-width="2"/>
+            <line class="{flow_line_class}" x1="85" y1="69" x2="115" y2="69" stroke="#4F46E5" stroke-width="2"/>
 
             <!-- Node 2: Stage 1 -->
-            <rect x="115" y="45" width="85" height="48" rx="6" fill="#162032" stroke="#00D59B" stroke-width="1.5"/>
-            <text x="157" y="66" fill="#00D59B" font-size="10" font-weight="700" text-anchor="middle">STAGE 1</text>
-            <text x="157" y="80" fill="#94A3B8" font-size="9" text-anchor="middle">{stage1_repairs} fixes</text>
+            <rect x="115" y="45" width="85" height="48" rx="6" fill="#F8FAFC" stroke="#4F46E5" stroke-width="1.5"/>
+            <text x="157" y="66" fill="#4F46E5" font-size="10" font-weight="700" text-anchor="middle">STAGE 1</text>
+            <text x="157" y="80" fill="#64748B" font-size="9" text-anchor="middle">{stage1_repairs} fixes</text>
 
             <!-- Connector 2 -->
-            <line class="{flow_line_class}" x1="200" y1="69" x2="230" y2="69" stroke="#00D59B" stroke-width="2"/>
+            <line class="{flow_line_class}" x1="200" y1="69" x2="230" y2="69" stroke="#4F46E5" stroke-width="2"/>
 
             <!-- Node 3: KS Drift Guard -->
-            <rect x="230" y="45" width="75" height="48" rx="6" fill="#162032" stroke="#38BDF8" stroke-width="1.5"/>
-            <text x="267" y="66" fill="#38BDF8" font-size="10" font-weight="700" text-anchor="middle">KS GUARD</text>
-            <text x="267" y="80" fill="#00D59B" font-size="9" font-weight="600" text-anchor="middle">PASSED</text>
+            <rect x="230" y="45" width="75" height="48" rx="6" fill="#F8FAFC" stroke="#6366F1" stroke-width="1.5"/>
+            <text x="267" y="66" fill="#4F46E5" font-size="10" font-weight="700" text-anchor="middle">KS GUARD</text>
+            <text x="267" y="80" fill="#10B981" font-size="9" font-weight="600" text-anchor="middle">PASSED</text>
 
             <!-- Connector 3 -->
             <line class="{flow_line_class}" x1="305" y1="69" x2="335" y2="69" stroke="{stage2_stroke}" stroke-width="2"/>
 
             <!-- Node 4: Stage 2 AI Detective -->
-            <rect x="335" y="45" width="85" height="48" rx="6" fill="#162032" stroke="{stage2_stroke}" stroke-width="1.5" opacity="{stage2_opacity}"/>
+            <rect x="335" y="45" width="85" height="48" rx="6" fill="#F8FAFC" stroke="{stage2_stroke}" stroke-width="1.5" opacity="{stage2_opacity}"/>
             <text x="377" y="66" fill="{stage2_stroke}" font-size="10" font-weight="700" text-anchor="middle">STAGE 2 AI</text>
-            <text x="377" y="80" fill="#94A3B8" font-size="9" text-anchor="middle">{stage2_badge}</text>
+            <text x="377" y="80" fill="#64748B" font-size="9" text-anchor="middle">{stage2_badge}</text>
 
             <!-- Quarantine Side-Branch -->
             <path d="M 157 93 L 157 122 L 335 122" fill="none" stroke="#EF4444" stroke-width="1.5" stroke-dasharray="3 3"/>
             <g transform="translate(335, 108)">
-              <rect width="115" height="28" rx="5" fill="#162032" stroke="#EF4444" stroke-width="1.2"/>
-              <text x="10" y="18" fill="#FCA5A5" font-size="9" font-weight="700">QUARANTINE:</text>
-              <text x="82" y="18" fill="#EF4444" font-size="9" font-weight="800">{unresolved_count} trapped</text>
+              <rect width="115" height="28" rx="5" fill="#FEF2F2" stroke="#EF4444" stroke-width="1.2"/>
+              <text x="10" y="18" fill="#B91C1C" font-size="9" font-weight="700">QUARANTINE:</text>
+              <text x="82" y="18" fill="#DC2626" font-size="9" font-weight="800">{unresolved_count} trapped</text>
             </g>
 
             <!-- Final Cleaned Output Indicator -->
             <g transform="translate(425, 48)">
-              <circle cx="16" cy="21" r="14" fill="#00D59B" opacity="0.18"/>
-              <circle cx="16" cy="21" r="8" fill="#00D59B"/>
+              <circle cx="16" cy="21" r="14" fill="#4F46E5" opacity="0.15"/>
+              <circle cx="16" cy="21" r="8" fill="#4F46E5"/>
             </g>
           </svg>
         </div>
@@ -477,8 +477,8 @@ def render_ks_meter_html(check: Dict[str, Any], motion_enabled: bool) -> str:
     bar_pct = min(100.0, max(0.0, (ks_stat / 0.30) * 100.0))
     threshold_pct = (0.15 / 0.30) * 100.0  # 50%
 
-    badge_color = "#00D59B" if status == "passed" else ("#EF4444" if status == "rolled_back" else "#94A3B8")
-    badge_bg = "rgba(0, 213, 155, 0.12)" if status == "passed" else ("rgba(239, 68, 68, 0.12)" if status == "rolled_back" else "rgba(148, 163, 184, 0.12)")
+    badge_color = "#10B981" if status == "passed" else ("#DC2626" if status == "rolled_back" else "#64748B")
+    badge_bg = "rgba(16, 185, 129, 0.12)" if status == "passed" else ("rgba(220, 38, 38, 0.12)" if status == "rolled_back" else "rgba(100, 116, 139, 0.12)")
     badge_text = "PASSED (p >= 0.05)" if status == "passed" else ("ROLLED BACK (Drift)" if status == "rolled_back" else "SKIPPED")
 
     anim_css = """
@@ -492,13 +492,14 @@ def render_ks_meter_html(check: Dict[str, Any], motion_enabled: bool) -> str:
     <head>
     <meta charset="utf-8">
     <style>
-      body {{ margin: 0; padding: 0; background: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #F1F5F9; }}
+      body {{ margin: 0; padding: 0; background: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color: #0F172A; }}
       .ks-box {{
-        background-color: #111827;
-        border: 1px solid rgba(255, 255, 255, 0.07);
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 8px;
         padding: 12px 16px;
         margin-bottom: 8px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
       }}
       .ks-header {{
         display: flex;
@@ -509,7 +510,7 @@ def render_ks_meter_html(check: Dict[str, Any], motion_enabled: bool) -> str:
       .track-container {{
         position: relative;
         height: 12px;
-        background-color: #1E293B;
+        background-color: #E2E8F0;
         border-radius: 6px;
         overflow: visible;
         margin: 12px 0 6px 0;
@@ -535,16 +536,16 @@ def render_ks_meter_html(check: Dict[str, Any], motion_enabled: bool) -> str:
         top: -3px;
         width: 4px;
         height: 18px;
-        background: #FFFFFF;
+        background: #0F172A;
         border-radius: 2px;
-        box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 4px rgba(15, 23, 42, 0.3);
         transform: translateX(-50%);
       }}
       .ks-meta {{
         display: flex;
         justify-content: space-between;
         font-size: 10px;
-        color: #94A3B8;
+        color: #64748B;
         font-family: ui-monospace, SFMono-Regular, monospace;
       }}
       .status-pill {{
@@ -603,13 +604,13 @@ def generate_html_report(result: Dict[str, Any], filename: str, latency: Optiona
         rows = int(rc.get("affected_rows", 0))
         cols_str = ", ".join([html.escape(str(c)) for c in rc.get("affected_columns", [])])
         rc_cards += f"""
-        <div style="background:#111827;border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:12px;margin-bottom:8px;">
+        <div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;padding:12px;margin-bottom:8px;box-shadow:0 1px 3px rgba(15,23,42,0.05);">
           <div style="display:flex;justify-content:space-between;align-items:center;">
-            <strong style="color:#A5B4FC;font-size:13px;">[{c_id}] {cause}</strong>
-            <span style="background:rgba(129,140,248,0.12);color:#C7D2FE;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">{rows} rows affected</span>
+            <strong style="color:#4F46E5;font-size:13px;">[{c_id}] {cause}</strong>
+            <span style="background:rgba(79,70,229,0.08);color:#4F46E5;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;">{rows} rows affected</span>
           </div>
-          <div style="font-size:11px;color:#94A3B8;margin-top:4px;"><strong>Affected Columns:</strong> {cols_str}</div>
-          <div style="font-size:11px;color:#00D59B;margin-top:4px;"><strong>Recommended Action:</strong> {action}</div>
+          <div style="font-size:11px;color:#64748B;margin-top:4px;"><strong>Affected Columns:</strong> {cols_str}</div>
+          <div style="font-size:11px;color:#10B981;margin-top:4px;"><strong>Recommended Action:</strong> {action}</div>
         </div>
         """
 
@@ -657,18 +658,18 @@ def generate_html_report(result: Dict[str, Any], filename: str, latency: Optiona
 <meta charset="utf-8">
 <title>DataFix Autonomous Quality Report — {html.escape(filename)}</title>
 <style>
-  body {{ margin:0; padding:24px; background:#0B1120; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:#F1F5F9; }}
+  body {{ margin:0; padding:24px; background:#F8FAFC; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:#0F172A; }}
   .container {{ max-width:1100px; margin:0 auto; }}
-  h1,h2,h3 {{ color:#F1F5F9; }}
-  .header-card {{ background:#111827; border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:20px; margin-bottom:20px; }}
+  h1,h2,h3 {{ color:#0F172A; }}
+  .header-card {{ background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow:0 1px 3px rgba(15,23,42,0.06); }}
   .grid {{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:16px 0; }}
-  .tile {{ background:#162032; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:12px; }}
-  .tile-title {{ font-size:11px; color:#94A3B8; text-transform:uppercase; font-weight:600; }}
-  .tile-val {{ font-size:24px; font-weight:800; color:#10B981; margin-top:4px; }}
+  .tile {{ background:#F1F5F9; border:1px solid #E2E8F0; border-radius:8px; padding:12px; }}
+  .tile-title {{ font-size:11px; color:#64748B; text-transform:uppercase; font-weight:600; }}
+  .tile-val {{ font-size:24px; font-weight:800; color:#4F46E5; margin-top:4px; }}
   table {{ width:100%; border-collapse:collapse; margin-top:12px; font-size:12px; }}
-  th,td {{ text-align:left; padding:8px 12px; border-bottom:1px solid #1E293B; }}
-  th {{ background:#162032; color:#94A3B8; text-transform:uppercase; font-size:10px; letter-spacing:0.5px; }}
-  .badge {{ background:rgba(16,185,129,0.12); color:#10B981; border:1px solid rgba(16,185,129,0.28); padding:2px 8px; border-radius:12px; font-size:10px; font-weight:700; }}
+  th,td {{ text-align:left; padding:8px 12px; border-bottom:1px solid #E2E8F0; }}
+  th {{ background:#F8FAFC; color:#64748B; text-transform:uppercase; font-size:10px; letter-spacing:0.5px; }}
+  .badge {{ background:rgba(79,70,229,0.08); color:#4F46E5; border:1px solid rgba(79,70,229,0.25); padding:2px 8px; border-radius:12px; font-size:10px; font-weight:700; }}
 </style>
 </head>
 <body>
@@ -677,7 +678,7 @@ def generate_html_report(result: Dict[str, Any], filename: str, latency: Optiona
     <div style="display:flex;justify-content:space-between;align-items:center;">
       <div>
         <h1 style="margin:0;font-size:22px;">DataFix Autonomous Quality & Audit Report</h1>
-        <div style="color:#94A3B8;font-size:12px;margin-top:4px;">Dataset: <strong>{html.escape(filename)}</strong> • SAPTHAHACKS'26 INNOVEDGE PS 01</div>
+        <div style="color:#64748B;font-size:12px;margin-top:4px;">Dataset: <strong>{html.escape(filename)}</strong> • SAPTHAHACKS'26 INNOVEDGE PS 01</div>
       </div>
       <span class="badge">100% LOCAL AUDIT VERIFIED</span>
     </div>
@@ -691,21 +692,21 @@ def generate_html_report(result: Dict[str, Any], filename: str, latency: Optiona
       <div class="tile">
         <div class="tile-title">Cleaned Rows</div>
         <div class="tile-val">{summary.get('cleaned_rows', 0)}</div>
-        <div style="font-size:10px;color:#94A3B8;">-{summary.get('duplicates_removed', 0)} duplicates dropped</div>
+        <div style="font-size:10px;color:#64748B;">-{summary.get('duplicates_removed', 0)} duplicates dropped</div>
       </div>
       <div class="tile">
         <div class="tile-title">Total Cell Repairs</div>
         <div class="tile-val">{summary.get('total_repairs', 0)}</div>
-        <div style="font-size:10px;color:#94A3B8;">S1: {summary.get('stage1_repairs', 0)} · S2: {summary.get('stage2_repairs', 0)}</div>
+        <div style="font-size:10px;color:#64748B;">S1: {summary.get('stage1_repairs', 0)} · S2: {summary.get('stage2_repairs', 0)}</div>
       </div>
       <div class="tile">
         <div class="tile-title">Quarantined Traps</div>
-        <div class="tile-val" style="color:#F87171;">{summary.get('unresolved_count', 0)}</div>
-        <div style="font-size:10px;color:#FCA5A5;">Protected from Hallucination</div>
+        <div class="tile-val" style="color:#DC2626;">{summary.get('unresolved_count', 0)}</div>
+        <div style="font-size:10px;color:#EF4444;">Protected from Hallucination</div>
       </div>
     </div>
 
-    <div style="font-family:monospace;font-size:11px;color:#94A3B8;background:#162032;padding:10px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);">
+    <div style="font-family:monospace;font-size:11px;color:#64748B;background:#F1F5F9;padding:10px;border-radius:6px;border:1px solid #E2E8F0;">
       <strong>INPUT SHA-256:</strong>  {quality_report.get('input_sha256', 'N/A')}<br>
       <strong>OUTPUT SHA-256:</strong> {quality_report.get('output_sha256', 'N/A')}
     </div>
@@ -741,13 +742,13 @@ def generate_html_report(result: Dict[str, Any], filename: str, latency: Optiona
 st.markdown(
     """
     <style>
-      /* Executive Solid Dark Background */
+      /* Executive Clean Light Background */
       .stApp {
-        background-color: #0B1120 !important;
+        background-color: #F8FAFC !important;
       }
       section[data-testid="stSidebar"] {
-        background-color: #080D1A !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+        background-color: #E2E8F0 !important;
+        border-right: 1px solid #CBD5E1 !important;
       }
       .block-container {
         padding-top: 1.25rem !important;
@@ -769,9 +770,9 @@ st.markdown(
       .df-hero-pill {
         display: inline-flex;
         align-items: center;
-        background: rgba(16, 185, 129, 0.1);
-        color: #10B981;
-        border: 1px solid rgba(16, 185, 129, 0.25);
+        background: rgba(79, 70, 229, 0.08);
+        color: #4F46E5;
+        border: 1px solid rgba(79, 70, 229, 0.25);
         border-radius: 14px;
         padding: 3px 10px;
         font-size: 11px;
@@ -789,9 +790,9 @@ st.markdown(
       }
       .df-chip {
         display: inline-block;
-        background-color: #162032;
-        color: #38BDF8;
-        border: 1px solid rgba(255, 255, 255, 0.07);
+        background-color: #EEF2FF;
+        color: #4F46E5;
+        border: 1px solid #C7D2FE;
         border-radius: 4px;
         padding: 2px 7px;
         font-size: 11px;
@@ -799,25 +800,25 @@ st.markdown(
         margin: 2px 3px;
       }
       .df-repair-card {
-        background-color: #111827;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background-color: #FFFFFF;
+        border: 1px solid #E2E8F0;
         border-radius: 8px;
         padding: 12px 14px;
         margin-bottom: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
         animation: fadeSlideUp 0.3s ease-out;
       }
       .df-diff-del {
-        background-color: rgba(239, 68, 68, 0.18);
-        color: #FCA5A5;
+        background-color: rgba(239, 68, 68, 0.12);
+        color: #DC2626;
         text-decoration: line-through;
         padding: 2px 6px;
         border-radius: 4px;
         font-family: ui-monospace, SFMono-Regular, monospace;
       }
       .df-diff-ins {
-        background-color: rgba(16, 185, 129, 0.18);
-        color: #10B981;
+        background-color: rgba(79, 70, 229, 0.12);
+        color: #4F46E5;
         text-decoration: none;
         padding: 2px 6px;
         border-radius: 4px;
@@ -1204,9 +1205,9 @@ if st.session_state.pipeline_result:
         st.markdown("#### Blast-Radius Principle: Quarantined & Preserved Cells")
         st.markdown(
             """
-            <div style="background:#111827;border:1px solid rgba(239,68,68,0.28);border-radius:8px;padding:12px 16px;margin-bottom:14px;">
-              <strong style="color:#F87171;">Blast-Radius Principle: Zero Hallucination Guarantee</strong><br>
-              <span style="font-size:12px;color:#94A3B8;">
+            <div style="background:#FEF2F2;border:1px solid rgba(239,68,68,0.28);border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+              <strong style="color:#DC2626;">Blast-Radius Principle: Zero Hallucination Guarantee</strong><br>
+              <span style="font-size:12px;color:#64748B;">
                 DataFix refuses to make speculative guesses on ambiguous cells. Cells with confidence &lt; 0.60,
                 unbacked functional dependencies (e.g. missing postal code and missing city), or domain boundary violations
                 (e.g. negative age) are strictly quarantined and preserved untouched for human verification.
