@@ -15,6 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import httpx
 import pandas as pd
+import requests
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -38,9 +39,8 @@ def start_backend():
     if os.getenv("STREAMLIT_TESTING") or os.getenv("PYTEST_CURRENT_TEST"):
         return
     try:
-        with urllib.request.urlopen("http://127.0.0.1:8000/health", timeout=0.5) as resp:
-            if resp.status == 200:
-                return
+        if requests.get("http://127.0.0.1:8000/docs", timeout=0.5).status_code == 200:
+            return
     except Exception:
         pass
 
@@ -51,15 +51,12 @@ def start_backend():
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
         )
-        # Give Uvicorn up to 15 seconds to boot cleanly before rendering the UI
-        for _ in range(60):
-            time.sleep(0.25)
+        for _ in range(30):  # Wait up to 15 seconds (30 x 0.5s) for FastAPI to boot
             try:
-                with urllib.request.urlopen("http://127.0.0.1:8000/health", timeout=0.25) as resp:
-                    if resp.status == 200:
-                        break
+                if requests.get("http://127.0.0.1:8000/docs", timeout=0.5).status_code == 200:
+                    break
             except Exception:
-                pass
+                time.sleep(0.5)
     except Exception as e:
         print(f"DataFix backend auto-spawn note: {e}", file=sys.stderr)
 
