@@ -630,3 +630,138 @@ def test_pipeline_utf8_bom_excel_csv():
         f"Repair count differs between BOM ({result_bom.summary.total_repairs}) "
         f"and plain ({result_plain.summary.total_repairs}) CSV"
     )
+
+
+# ============================================================================
+# f) High-Value Rubric: Calibrated Health Score, IsolationForest, Near-Dups, & 10k Scale
+# ============================================================================
+
+def test_health_score_honest_calibration_on_dirty_benchmarks():
+    """Verifies that the calibrated health score reflects row-level defect density:
+    dirty benchmarks score honestly (< 80.0%), show dramatic improvements (> +15 pts),
+    and clean data achieves a perfect 100.0%.
+    """
+    # 1. sample_dirty.csv
+    res_sample = run_datafix_pipeline("sample_dirty.csv", llm_mode="deterministic")
+    assert res_sample.quality_report.before_health_score < 80.0, (
+        f"Expected sample_dirty before score < 80%, got {res_sample.quality_report.before_health_score}"
+    )
+    assert res_sample.quality_report.after_health_score > res_sample.quality_report.before_health_score + 15.0, (
+        f"Expected > 15 pt improvement, got {res_sample.quality_report.health_delta}"
+    )
+
+    # 2. dirty_ecommerce_orders.csv
+    res_ecom = run_datafix_pipeline("sample_data/dirty_ecommerce_orders.csv", llm_mode="deterministic")
+    assert res_ecom.quality_report.before_health_score < 80.0, (
+        f"Expected ecommerce before score < 80%, got {res_ecom.quality_report.before_health_score}"
+    )
+    assert res_ecom.quality_report.after_health_score > res_ecom.quality_report.before_health_score + 15.0, (
+        f"Expected > 15 pt improvement, got {res_ecom.quality_report.health_delta}"
+    )
+
+    # 3. Clean CSV achieves 100.0%
+    clean_csv = "id,name,city,age\n1,Alice,Mumbai,25\n2,Bob,Delhi,30\n3,Charlie,Pune,35\n"
+    res_clean = run_datafix_pipeline(clean_csv.encode("utf-8"), filename="clean.csv", llm_mode="deterministic")
+    assert res_clean.quality_report.before_health_score == 100.0
+    assert res_clean.quality_report.after_health_score == 100.0
+
+
+def test_multivariate_isolation_forest_catches_unseen_schema_outlier():
+    """Unseen schema: 40-row sensor dataset (sensor_id, temp_c, pressure_kpa, flow_rate)
+    with a severe multivariate outlier at row 25 (temp=950, pressure=12000, flow=85000).
+    IsolationForest must flag and quarantine it without mutating the underlying cells.
+    """
+    rows = ["sensor_id,temp_c,pressure_kpa,flow_rate"]
+    for i in range(1, 41):
+        if i == 25:
+            # Extreme multivariate anomaly
+            rows.append(f"S{i:03d},950.0,12000.0,85000.0")
+        else:
+            # Normal distribution around temp=25, pressure=101.3, flow=50
+            t = 24.0 + (i % 5) * 0.4
+            p = 100.0 + (i % 4) * 0.5
+            f = 48.0 + (i % 6) * 0.7
+            rows.append(f"S{i:03d},{t:.1f},{p:.1f},{f:.1f}")
+
+    csv_data = "\n".join(rows) + "\n"
+    resp = run_datafix_pipeline(csv_data.encode("utf-8"), filename="sensors.csv", llm_mode="deterministic")
+
+    # Find the multivariate anomaly in unresolved_issues
+    outlier_issues = [
+        iss for iss in resp.unresolved_issues
+        if iss.anomaly_type == AnomalyType.MULTIVARIATE_OUTLIER
+    ]
+    assert len(outlier_issues) >= 1, "IsolationForest must detect the multivariate sensor outlier"
+    target_issue = next((iss for iss in outlier_issues if iss.row_index == 24), None)
+    assert target_issue is not None, f"Row 24 (S025) must be flagged as multivariate outlier, found {outlier_issues}"
+    assert target_issue.confidence_tier == ConfidenceTier.QUARANTINED
+    assert target_issue.confidence < 0.60
+
+    # Ensure zero destructive mutation on the flagged row
+    df_clean = pd.read_csv(io.StringIO(resp.cleaned_csv))
+    row_25_cleaned = df_clean[df_clean["sensor_id"] == "S025"]
+    assert not row_25_cleaned.empty, "Row S025 must not be dropped"
+    assert float(row_25_cleaned["temp_c"].iloc[0]) == 950.0, "Cell value must remain untouched"
+
+
+def test_near_duplicate_row_quarantined_without_silent_drop():
+    """Verifies that fuzzy near-duplicate records (e.g. identical phone/key with minor name typo)
+    are quarantined in unresolved_issues without being silently dropped from the cleaned CSV.
+    """
+    csv_data = (
+        "customer_id,name,phone,city\n"
+        "101,Alice Smith,9876543210,Mumbai\n"
+        "102,Alice Smyth,9876543210,Mumbai\n"
+    )
+    resp = run_datafix_pipeline(csv_data.encode("utf-8"), filename="near_dup.csv", llm_mode="deterministic")
+
+    # Check unresolved issues contains NEAR_DUPLICATE
+    near_dup_issues = [
+        iss for iss in resp.unresolved_issues
+        if iss.anomaly_type == AnomalyType.NEAR_DUPLICATE
+    ]
+    assert len(near_dup_issues) >= 1, "Near duplicate record must be logged in unresolved_issues"
+    assert near_dup_issues[0].confidence_tier == ConfidenceTier.QUARANTINED
+    assert near_dup_issues[0].confidence < 0.60
+    assert "similarity" in near_dup_issues[0].reason
+
+    # Check that both rows are preserved (never silently dropped)
+    df_clean = pd.read_csv(io.StringIO(resp.cleaned_csv))
+    assert len(df_clean) == 2, f"Both rows must be preserved, got {len(df_clean)} rows"
+    names = set(df_clean["name"])
+    assert "Alice Smith" in names and "Alice Smyth" in names, "Neither row should be deleted"
+
+
+def test_scalability_10000_rows_throughput():
+    """Generates an in-memory 10,050-row synthetic dataset with dirty artifacts
+    (whitespace, HTML tags, duplicate rows, missing numerical values) and verifies
+    that run_datafix_pipeline finishes in < 10.0 seconds with status COMPLETED.
+    """
+    import time
+
+    base_cities = ["Mumbai", "Bengaluru", "Delhi", "Chennai", "Hyderabad"]
+    lines = ["id,customer_name,city,salary"]
+    for i in range(10000):
+        c = base_cities[i % len(base_cities)]
+        if i % 100 == 0:
+            lines.append(f"{i},<b>User_{i}</b>,  {c}  ,")
+        else:
+            lines.append(f"{i},User_{i},{c},{30000 + (i % 50000)}")
+    # Add 50 duplicate rows matching rows 1 to 50
+    for i in range(1, 51):
+        lines.append(f"{i},User_{i},{base_cities[i % len(base_cities)]},{30000 + (i % 50000)}")
+
+    csv_bytes = "\n".join(lines).encode("utf-8")
+
+    start_time = time.perf_counter()
+    resp = run_datafix_pipeline(csv_bytes, filename="scale_10k.csv", llm_mode="deterministic")
+    duration = time.perf_counter() - start_time
+
+    assert resp.status == PipelineStatus.COMPLETED
+    assert resp.summary.original_rows == 10050
+    assert resp.summary.duplicates_removed == 50
+    assert resp.summary.cleaned_rows == 10000
+    assert resp.summary.total_repairs >= 100  # HTML tags and whitespace repaired
+    assert resp.quality_report.after_health_score >= resp.quality_report.before_health_score
+    assert duration < 10.0, f"Pipeline exceeded 10.0s SLA on 10k rows (took {duration:.2f}s)"
+

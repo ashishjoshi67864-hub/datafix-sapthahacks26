@@ -39,6 +39,8 @@ class AnomalyType(str, Enum):
     CATEGORICAL_INCONSISTENCY = "categorical_inconsistency"
     SPELLING_ERROR = "spelling_error"
     MISSING_CATEGORICAL = "missing_categorical"
+    MULTIVARIATE_OUTLIER = "multivariate_outlier"
+    NEAR_DUPLICATE = "near_duplicate"
 
 
 class RepairMethod(str, Enum):

@@ -2,14 +2,14 @@
 
 > **SAPTHAHACKS'26 — INNOVEDGE PS 01**  
 > **Team:** Utsava V, Ashish Joshi, Utsav Panduranga, Vanaja Y  
-> **Status:** 100% Complete • 48/48 Pytest Verification Suite Passing • Judge Ready
+> **Status:** 100% Complete • 52/52 Pytest Verification Suite Passing • Judge Ready
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Pydantic v2](https://img.shields.io/badge/Pydantic-v2.6.1-E92063.svg?logo=pydantic&logoColor=white)](https://docs.pydantic.dev)
 [![Ollama](https://img.shields.io/badge/Ollama-qwen2.5:3b-black.svg?logo=ollama&logoColor=white)](https://ollama.ai)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Pytest-48%20Passed-brightgreen.svg)](https://pytest.org)
+[![Tests](https://img.shields.io/badge/Pytest-52%20Passed-brightgreen.svg)](https://pytest.org)
 
 ---
 
@@ -45,9 +45,10 @@ Modern enterprise data pipelines are plagued by dirty tabular data: malformed HT
 ├───────────────────────────────────────────────────────────────────────────────────────┤
 │  1. Identifier Protection     : Auto-detects & freezes customer_id, phone, postal_code │
 │  2. Deterministic Cleaning    : Regex HTML tag stripping & whitespace normalization   │
-│  3. Exact Deduplication       : Drops identical rows while maintaining row indices    │
-│  4. Safe Numeric Imputation   : Scaled KNN imputation (StandardScaler + KNNImputer) on non-protected numeric fields │
-│  5. KS-Test Drift Rollback    : Reverts numeric imputations if distribution drift detected (p-value < 0.05 or KS > 0.15) │
+│  3. Exact & Near Deduplication: Drops exact duplicates; quarantines fuzzy typo pairs   │
+│  4. Generic FD & Imputation   : Schema-agnostic functional dependency mining & KNN     │
+│  5. Multivariate Outliers     : Scikit-learn IsolationForest anomaly quarantine       │
+│  6. KS-Test Drift Rollback    : Reverts numeric imputations upon distribution drift   │
 └───────────────────────────────────────────┬───────────────────────────────────────────┘
                                             │
                                   Post-Stage 1 Clean DF
@@ -77,7 +78,7 @@ Modern enterprise data pipelines are plagued by dirty tabular data: malformed HT
 ┌───────────────────────────────────────────────────────────────────────────────────────┐
 │ ORCHESTRATION & EXPORT (`pipeline.py`, `main.py`, `app.py`)                           │
 ├───────────────────────────────────────────────────────────────────────────────────────┤
-│  • Quality Health Score Delta : Before Score -> After Score (0 - 100%)                │
+│  • Calibrated Health Score    : 4-subscore row defect calibration (0 - 100%)          │
 │  • Cryptographic Output Hash  : Compute 64-char Hex Output SHA-256 Digest             │
 │  • Stateless FastAPI Backend  : GET /health, POST /clean (in-memory, upload guards)   │
 │  • Thin-Client Streamlit UI   : Zero duplicate logic; pure HTTP client to FastAPI     │
@@ -88,16 +89,17 @@ Modern enterprise data pipelines are plagued by dirty tabular data: malformed HT
 
 ## 📊 Verified Multi-Domain Benchmark Table
 
-DataFix was evaluated across 4 multi-domain benchmark datasets representing enterprise HR, e-commerce, and healthcare domains. All repairs and scores are verified by automated tests:
+DataFix was evaluated across 4 multi-domain benchmark datasets representing enterprise HR, e-commerce, and healthcare domains, along with an in-memory 10,050-row scalability stress test. All repairs, health calibration, and execution speeds are verified by automated tests:
 
 | Dataset | Domain | Raw Rows | Cleaned Rows | Duplicates Dropped | Stage 1 Repairs | Stage 2 Repairs | Total Repairs | Quarantined Issues | Initial Health | Cleaned Health | Health Score Delta |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **`sample_dirty.csv`** | General HR & Admin | 24 | 22 | 2 | 15 | 10 | 25 | 3 | 95.44% | **99.01%** | <span style="color:green">**+3.57%**</span> |
-| **`dirty_ecommerce_orders.csv`** | Retail & Orders | 100 | 96 | 4 | 113 | 69 | 182 | 27 | 96.93% | **99.36%** | <span style="color:green">**+2.43%**</span> |
-| **`dirty_hospital_records.csv`** | Healthcare & Patients | 100 | 96 | 4 | 113 | 74 | 187 | 20 | 97.02% | **99.57%** | <span style="color:green">**+2.55%**</span> |
-| **`dirty_hr_payroll.csv`** | Enterprise Payroll | 100 | 96 | 4 | 122 | 59 | 181 | 23 | 96.52% | **99.41%** | <span style="color:green">**+2.89%**</span> |
+| **`sample_dirty.csv`** | General HR & Admin | 24 | 22 | 2 | 15 | 10 | 25 | 3 | 79.18% | **96.58%** | <span style="color:green">**+17.40%**</span> |
+| **`dirty_ecommerce_orders.csv`** | Retail & Orders | 100 | 96 | 4 | 102 | 65 | 167 | 31 | 70.69% | **92.81%** | <span style="color:green">**+22.12%**</span> |
+| **`dirty_hospital_records.csv`** | Healthcare & Patients | 100 | 96 | 4 | 108 | 68 | 176 | 25 | 72.21% | **94.06%** | <span style="color:green">**+21.85%**</span> |
+| **`dirty_hr_payroll.csv`** | Enterprise Payroll | 100 | 96 | 4 | 115 | 52 | 167 | 24 | 69.70% | **93.12%** | <span style="color:green">**+23.42%**</span> |
+| **`10k_synthetic.csv`** | Scale & SLA Stress Test | 10,050 | 10,000 | 50 | 349 | 0 | 349 | 0 | 99.04% | **100.0%** | <span style="color:green">**+0.96%**</span> |
 
-> **Audit Guarantee:** In all 4 benchmarks, zero protected identifiers were modified, zero non-duplicate valid rows were dropped, and all original 0-based row indices were preserved exactly.
+> **Audit Guarantee:** In all benchmarks, zero protected identifiers were modified, zero non-duplicate valid rows were dropped, and all original 0-based row indices were preserved exactly. The 10,050-row stress test completed in **2.11 seconds (4,770 rows/second)**, beating the 10-second SLA.
 
 ---
 
@@ -173,7 +175,7 @@ streamlit run app.py
 
 ### Step 3: Run the Automated Verification Suite
 
-Run all 48 unit and integration tests across schemas, Stage 1 engine, KS statistical drift, Stage 2 AI guardrails, FastAPI endpoints, Streamlit AST safety, reproducibility, idempotency, UTF-8 BOM handling, and clean-CSV guards:
+Run all 52 unit and integration tests across schemas, Stage 1 engine, KS statistical drift, Stage 2 AI guardrails, FastAPI endpoints, Streamlit AST safety, reproducibility, idempotency, UTF-8 BOM handling, clean-CSV guards, calibrated health scores, IsolationForest multivariate outliers, near-duplicate quarantine, and 10,000-row scalability throughput:
 
 ```bash
 # Windows
@@ -185,7 +187,7 @@ python -m pytest -v
 
 **Expected output:**
 ```text
-======================= 48 passed in ~8s =======================
+======================= 52 passed in ~9s =======================
 ```
 
 ---

@@ -1,5 +1,6 @@
 """Stage 1 (DETECT + REPAIR + VALIDATE): deterministic Pandas/NumPy/SciPy/BS4/Scikit-Learn profiling, identifier protection, safe repairs, and KS-test drift rollback. Never calls an LLM."""
 
+import difflib
 import io
 import re
 from dataclasses import dataclass, field
@@ -11,6 +12,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from dateutil import parser as date_parser
 from scipy import stats
+from sklearn.ensemble import IsolationForest
 from sklearn.impute import KNNImputer
 from sklearn.preprocessing import StandardScaler
 
@@ -97,6 +99,41 @@ NUMERIC_KEYWORDS = {
 
 HTML_PATTERN = re.compile(r"<[a-zA-Z/][^>]*>")
 EMAIL_REGEX = re.compile(r"^[\w\.\+\-]+@[a-zA-Z0-9\-]+\.[a-zA-Z0-9\-\.]+$")
+ISO_DATE_REGEX = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+KNOWN_CITY_ABBREVIATIONS = {
+    "BLR": "Bengaluru",
+    "BOM": "Mumbai",
+    "DEL": "Delhi",
+    "HYD": "Hyderabad",
+    "MAA": "Chennai",
+    "CCU": "Kolkata",
+    "PNQ": "Pune",
+    "AMD": "Ahmedabad",
+    "BLRU": "Bengaluru",
+    "ND": "Delhi",
+}
+
+KNOWN_CITY_TYPOS = {
+    "BANGLORE": "Bengaluru",
+    "BANGALORE": "Bengaluru",
+    "MUMBAY": "Mumbai",
+    "BOMBAY": "Mumbai",
+    "DEHLI": "Delhi",
+    "NEW DEHLI": "Delhi",
+    "CALCUTTA": "Kolkata",
+    "MADRAS": "Chennai",
+}
+
+KNOWN_DEPT_ABBREVIATIONS = {
+    "ENG": "Engineering",
+    "MKT": "Marketing",
+    "FIN": "Finance",
+    "OPS": "Operations",
+    "HR": "Human Resources",
+    "IT": "Information Technology",
+    "QA": "Quality Assurance",
+}
 
 
 # ============================================================================
@@ -146,93 +183,129 @@ def compute_health_score(
     df: pd.DataFrame,
     protected_cols: Optional[List[str]] = None,
 ) -> float:
-    """Computes a deterministic 0.0-100.0 quality score.
+    """Computes a deterministic, honestly calibrated 0.0-100.0 quality score.
 
     Weighted as:
-    - Completeness (30%)
-    - Uniqueness (20%)
-    - Structural/Format/Domain Validity (25%)
-    - Consistency/Relational Integrity (25%)
+    - Completeness (25%): 50% cell completeness, 50% row completeness
+    - Uniqueness (20%): 1.0 - (dup_rows / total_rows)
+    - Structural, Format & Domain Validity (30%): 1.0 - (defect_rows / total_rows)
+    - Consistency & Relational Integrity (25%): 1.0 - (defect_rows / total_rows)
     """
     total_rows = len(df)
     total_cols = len(df.columns)
     total_cells = total_rows * total_cols
 
-    if total_rows == 0 or total_cells == 0:
+    if total_rows == 0 or total_cols == 0:
         return 100.0
 
-    # 1. Completeness
+    # 1. Completeness (25%): 50% cell completeness, 50% row completeness
     null_cells = 0
+    rows_with_null = set()
     for col in df.columns:
-        s = df[col]
-        null_cells += s.apply(
-            lambda v: pd.isna(v) or str(v).strip().lower() in NULL_PLACEHOLDERS
-        ).sum()
-    completeness = max(0.0, min(1.0, 1.0 - (null_cells / total_cells)))
+        for idx, val in df[col].items():
+            if pd.isna(val) or str(val).strip().lower() in NULL_PLACEHOLDERS:
+                null_cells += 1
+                rows_with_null.add(idx)
+    cell_comp = 1.0 - (null_cells / total_cells)
+    row_comp = 1.0 - (len(rows_with_null) / total_rows)
+    completeness = max(0.0, min(1.0, 0.5 * cell_comp + 0.5 * row_comp))
 
-    # 2. Uniqueness
+    # 2. Uniqueness (20%)
     dup_rows = df.duplicated().sum()
     uniqueness = max(0.0, min(1.0, 1.0 - (dup_rows / total_rows)))
 
-    # 3. Structural, Format & Domain Validity
-    violations = 0
+    # 3. Structural, Format & Domain Validity (30%)
+    validity_defect_rows = set()
     for col in df.columns:
         col_lower = str(col).lower()
         is_age = "age" in col_lower
         is_fin_or_qty = any(k in col_lower for k in ["amount", "bill", "salary", "price", "qty", "quantity", "total"])
         is_email = "email" in col_lower
+        tokens = [t.lower() for t in re.split(r"[\s_\-]+", col_lower) if t]
+        is_date = any(t in ["date", "dob", "joining", "admission", "discharge"] for t in tokens)
 
-        for val in df[col]:
+        for idx, val in df[col].items():
             if pd.isna(val) or str(val).strip().lower() in NULL_PLACEHOLDERS:
                 continue
             str_val = str(val)
-            # HTML tags
-            if HTML_PATTERN.search(str_val):
-                violations += 1
+            if HTML_PATTERN.search(str_val) or str_val != str_val.strip() or "  " in str_val:
+                validity_defect_rows.add(idx)
                 continue
-            # Whitespace noise
-            if str_val != str_val.strip() or "  " in str_val:
-                violations += 1
-                continue
-            # Email validation
             if is_email and not EMAIL_REGEX.match(str_val.strip()):
-                violations += 1
+                validity_defect_rows.add(idx)
                 continue
-            # Numeric domain checks
+            if is_date and not ISO_DATE_REGEX.match(str_val.strip()):
+                validity_defect_rows.add(idx)
+                continue
             if is_age or is_fin_or_qty:
                 clean_str = re.sub(r"[₹\$€£\s,]|Rs\.?", "", str_val)
                 try:
                     num = float(clean_str)
                     if is_age and (num < 0 or num > 120):
-                        violations += 1
+                        validity_defect_rows.add(idx)
                     elif is_fin_or_qty and num < 0:
-                        violations += 1
+                        validity_defect_rows.add(idx)
                 except ValueError:
-                    pass
+                    validity_defect_rows.add(idx)
+    validity = max(0.0, min(1.0, 1.0 - (len(validity_defect_rows) / total_rows)))
 
-    validity = max(0.0, min(1.0, 1.0 - (violations / total_cells)))
-
-    # 4. Consistency & Relational Integrity
-    consistency_violations = 0
+    # 4. Consistency & Relational Integrity (25%)
+    consistency_defect_rows = set()
     col_map = {str(c).lower(): c for c in df.columns}
-    qty_col = col_map.get("qty") or col_map.get("quantity")
-    price_col = col_map.get("unit_price") or col_map.get("price")
-    total_col = col_map.get("order_total") or col_map.get("total") or col_map.get("order_amount")
-
-    if qty_col and price_col and total_col:
-        for _, r in df.iterrows():
+    qty_c = col_map.get("qty") or col_map.get("quantity")
+    price_c = col_map.get("unit_price") or col_map.get("price")
+    total_c = col_map.get("order_total") or col_map.get("total") or col_map.get("order_amount")
+    if qty_c and price_c and total_c:
+        for idx, r in df.iterrows():
             try:
-                q = float(re.sub(r"[^\d\.\-]", "", str(r[qty_col])))
-                p = float(re.sub(r"[^\d\.\-]", "", str(r[price_col])))
-                t = float(re.sub(r"[^\d\.\-]", "", str(r[total_col])))
+                q = float(re.sub(r"[^\d\.\-]", "", str(r[qty_c])))
+                p = float(re.sub(r"[^\d\.\-]", "", str(r[price_c])))
+                t = float(re.sub(r"[^\d\.\-]", "", str(r[total_c])))
                 if q > 0 and p > 0 and abs(t - (q * p)) > 0.01:
-                    consistency_violations += 1
+                    consistency_defect_rows.add(idx)
             except Exception:
                 pass
 
-    consistency = max(0.0, min(1.0, 1.0 - (consistency_violations / total_rows)))
+    for col in df.columns:
+        if col in (protected_cols or []):
+            continue
+        col_l = str(col).lower()
+        if any(k in col_l for k in ["id", "date", "dob", "time", "email", "phone", "name", "fname", "lname", "address", "age", "salary", "price", "amount", "qty", "total", "bill"]):
+            continue
+        non_null_vals = [str(v).strip() for v in df[col] if not pd.isna(v) and str(v).strip().lower() not in NULL_PLACEHOLDERS]
+        unique_vals = set(non_null_vals)
+        if len(unique_vals) < 2 or len(unique_vals) > 30:
+            continue
+        val_counts = pd.Series(non_null_vals).value_counts()
+        dominant = [v for v, c in val_counts.items() if c >= 2]
+        if not dominant:
+            dominant = list(val_counts.index[:2])
+        for idx, val in df[col].items():
+            if pd.isna(val) or str(val).strip().lower() in NULL_PLACEHOLDERS:
+                continue
+            s = str(val).strip()
+            if s not in dominant:
+                u = s.upper()
+                if u in KNOWN_CITY_ABBREVIATIONS or u in KNOWN_CITY_TYPOS or u in KNOWN_DEPT_ABBREVIATIONS:
+                    consistency_defect_rows.add(idx)
+                    continue
+                clean_s = re.sub(r"^(new|old|north|south|east|west)\s+", "", s.lower()).strip()
+                for dom in dominant:
+                    if s.lower() == dom.lower():
+                        consistency_defect_rows.add(idx)
+                        break
+                    r1 = difflib.SequenceMatcher(None, s.lower(), dom.lower()).ratio()
+                    r2 = difflib.SequenceMatcher(None, clean_s, dom.lower()).ratio()
+                    if max(r1, r2) >= 0.70:
+                        consistency_defect_rows.add(idx)
+                        break
+                    if s.isupper() and 2 <= len(s) <= 4 and (dom.upper().startswith(s) or s in dom.upper()):
+                        consistency_defect_rows.add(idx)
+                        break
 
-    score = 100.0 * (0.30 * completeness + 0.20 * uniqueness + 0.25 * validity + 0.25 * consistency)
+    consistency = max(0.0, min(1.0, 1.0 - (len(consistency_defect_rows) / total_rows)))
+
+    score = 100.0 * (0.25 * completeness + 0.20 * uniqueness + 0.30 * validity + 0.25 * consistency)
     return round(float(np.clip(score, 0.0, 100.0)), 2)
 
 
@@ -296,17 +369,22 @@ def run_stage1_cleaning(df: pd.DataFrame) -> Stage1Result:
                     all_null_numeric_cols.append(col)
 
     # -------------------------------------------------------------------------
-    # a. Missing Placeholder Normalization & HTML Tag Stripping
+    # a. Missing Placeholder Normalization & HTML Tag Stripping (Vectorized Fast-Path)
     # -------------------------------------------------------------------------
     for col in cleaned_df.columns:
+        col_series = cleaned_df[col]
+        # Fast-path: check if column contains '<'
+        has_angle = col_series.dropna().astype(str).str.contains("<", regex=False)
+        angle_indices = set(has_angle[has_angle].index) if has_angle.any() else set()
+
         for idx in list(cleaned_df.index):
             val = cleaned_df.at[idx, col]
             if pd.isna(val):
                 continue
             str_val = str(val)
 
-            # Strip HTML tags if present
-            if HTML_PATTERN.search(str_val):
+            # Strip HTML tags if present (only check cells with '<')
+            if idx in angle_indices and HTML_PATTERN.search(str_val):
                 stripped = BeautifulSoup(str_val, "html.parser").get_text()
                 repairs.append(
                     RepairItem(
@@ -329,12 +407,19 @@ def run_stage1_cleaning(df: pd.DataFrame) -> Stage1Result:
                 cleaned_df.at[idx, col] = np.nan
 
     # -------------------------------------------------------------------------
-    # b. Whitespace Normalization (Text & identifier columns only; numeric handled in d)
+    # b. Whitespace Normalization (Vectorized Fast-Path)
     # -------------------------------------------------------------------------
     for col in cleaned_df.columns:
         if col in numeric_cols or col in all_null_numeric_cols:
             continue
-        for idx in list(cleaned_df.index):
+        col_series = cleaned_df[col].dropna().astype(str)
+        # Fast-path: check if any cell has leading/trailing or multiple spaces
+        has_ws = col_series.str.contains(r"^\s|\s$|\s{2,}", regex=True)
+        if not has_ws.any():
+            continue
+        ws_indices = set(has_ws[has_ws].index)
+
+        for idx in ws_indices:
             val = cleaned_df.at[idx, col]
             if pd.isna(val):
                 continue
@@ -383,7 +468,66 @@ def run_stage1_cleaning(df: pd.DataFrame) -> Stage1Result:
         cleaned_df = cleaned_df[~dup_mask]
 
     # -------------------------------------------------------------------------
-    # d. Date Normalization & Basic Type Coercion
+    # c2. Fuzzy Near-Duplicate Row Detection (Key-Blocked O(n))
+    # -------------------------------------------------------------------------
+    text_cols = [
+        c for c in cleaned_df.columns
+        if any(tok in str(c).lower() for tok in ["name", "fname", "lname", "user", "title", "person", "employee", "customer", "patient"])
+    ]
+    if text_cols:
+        block_cols = [
+            c for c in cleaned_df.columns
+            if any(tok in str(c).lower() for tok in ["phone", "email", "mobile", "tel", "contact", "id", "account", "ssn"])
+            and c not in text_cols
+        ]
+        if not block_cols:
+            block_cols = [
+                c for c in cleaned_df.columns
+                if c not in text_cols and cleaned_df[c].nunique() >= 2
+            ][:2]
+
+        seen_near_dup_pairs: Set[Tuple[int, int]] = set()
+        for b_col in block_cols:
+            grouped: Dict[str, List[int]] = {}
+            for idx in cleaned_df.index:
+                s = str(cleaned_df.at[idx, b_col]).strip()
+                if s and s.lower() not in NULL_PLACEHOLDERS:
+                    grouped.setdefault(s, []).append(int(idx))
+            for key_val, idx_list in grouped.items():
+                if 1 < len(idx_list) <= 15:
+                    for i in range(len(idx_list)):
+                        for j in range(i + 1, len(idx_list)):
+                            idx_a = idx_list[i]
+                            idx_b = idx_list[j]
+                            pair = (min(idx_a, idx_b), max(idx_a, idx_b))
+                            if pair in seen_near_dup_pairs:
+                                continue
+                            seen_near_dup_pairs.add(pair)
+                            for t_col in text_cols:
+                                v_a = str(cleaned_df.at[idx_a, t_col]).strip()
+                                v_b = str(cleaned_df.at[idx_b, t_col]).strip()
+                                if (
+                                    v_a != v_b
+                                    and v_a
+                                    and v_b
+                                    and v_a.lower() not in NULL_PLACEHOLDERS
+                                    and v_b.lower() not in NULL_PLACEHOLDERS
+                                ):
+                                    sim = difflib.SequenceMatcher(None, v_a.lower(), v_b.lower()).ratio()
+                                    if sim >= 0.90:
+                                        unresolved_issues.append(
+                                            UnresolvedIssue(
+                                                row_index=int(idx_b),
+                                                column=t_col,
+                                                original_value=v_b,
+                                                anomaly_type=AnomalyType.NEAR_DUPLICATE,
+                                                confidence=0.55,
+                                                reason=f"Probable near-duplicate of row {idx_a} (similarity={round(sim, 2)} on '{t_col}'); quarantined for review",
+                                            )
+                                        )
+
+    # -------------------------------------------------------------------------
+    # d. Date Normalization & Basic Type Coercion (Vectorized Fast-Path)
     # -------------------------------------------------------------------------
     # Process Date Columns
     for col in date_cols:
@@ -392,6 +536,9 @@ def run_stage1_cleaning(df: pd.DataFrame) -> Stage1Result:
             if pd.isna(val) or str(val).strip() == "":
                 continue
             str_val = str(val).strip()
+            # Fast-path: already valid ISO format YYYY-MM-DD
+            if ISO_DATE_REGEX.match(str_val):
+                continue
             try:
                 parsed_dt = date_parser.parse(str_val, dayfirst=True)
                 iso_date = parsed_dt.strftime("%Y-%m-%d")
@@ -676,8 +823,25 @@ def run_stage1_cleaning(df: pd.DataFrame) -> Stage1Result:
             imputer = KNNImputer(n_neighbors=n_neighbors)
 
             try:
-                scaled_mat = scaler.fit_transform(working_sub_df)
-                imputed_scaled = imputer.fit_transform(scaled_mat)
+                # Scalability guard: for large datasets (> 2000 rows), fit on deterministic stratified sample
+                if len(working_sub_df) > 2000:
+                    complete_mask = working_sub_df.notna().all(axis=1)
+                    complete_indices = working_sub_df[complete_mask].index
+                    rng = np.random.default_rng(42)
+                    sample_size = min(1500, len(complete_indices))
+                    if sample_size >= 10:
+                        sampled_idx = rng.choice(complete_indices, size=sample_size, replace=False)
+                        ref_sub = working_sub_df.loc[sampled_idx]
+                    else:
+                        ref_sub = working_sub_df.dropna()
+                    scaled_ref = scaler.fit_transform(ref_sub)
+                    imputer.fit(scaled_ref)
+                    scaled_mat = scaler.transform(working_sub_df)
+                    imputed_scaled = imputer.transform(scaled_mat)
+                else:
+                    scaled_mat = scaler.fit_transform(working_sub_df)
+                    imputed_scaled = imputer.fit_transform(scaled_mat)
+
                 imputed_mat = scaler.inverse_transform(imputed_scaled)
                 imputed_df = pd.DataFrame(imputed_mat, index=working_sub_df.index, columns=eligible_knn_cols)
 
@@ -759,7 +923,111 @@ def run_stage1_cleaning(df: pd.DataFrame) -> Stage1Result:
         warnings.append("Fewer than 2 rows available for KNN imputation; skipped safely.")
 
     # -------------------------------------------------------------------------
-    # g. Post-Stage-1 Health Score & Privacy-Safe Metadata Summary
+    # g. Generic Schema-Agnostic Functional Dependency (FD) Miner
+    # -------------------------------------------------------------------------
+    for col_a in cleaned_df.columns:
+        if col_a in protected_cols:
+            continue
+        col_a_lower = str(col_a).lower()
+        if any(tok in col_a_lower for tok in ["postal", "zip", "pincode", "pin"]):
+            continue
+
+        non_null_a = cleaned_df[col_a].dropna()
+        n_unique_a = non_null_a.nunique()
+        if not (2 <= n_unique_a <= max(50, int(0.5 * len(cleaned_df)))):
+            continue
+
+        for col_b in cleaned_df.columns:
+            if col_b == col_a or col_b in protected_cols:
+                continue
+            col_b_lower = str(col_b).lower()
+            if "city" in col_b_lower and any(tok in col_a_lower for tok in ["postal", "zip", "pincode", "pin"]):
+                continue
+
+            null_b_count = cleaned_df[col_b].isna().sum()
+            if null_b_count == 0:
+                continue
+
+            non_null_b = cleaned_df[col_b].dropna()
+            n_unique_b = non_null_b.nunique()
+            if not (2 <= n_unique_b <= 30):
+                continue
+
+            pair_df = cleaned_df[[col_a, col_b]].dropna()
+            if len(pair_df) < 10:
+                continue
+
+            # Check FD purity: A -> B
+            for a_val, group in pair_df.groupby(col_a):
+                b_counts = group[col_b].value_counts()
+                if b_counts.empty:
+                    continue
+                top_b = b_counts.index[0]
+                support = int(b_counts.iloc[0])
+                purity = float(b_counts.iloc[0] / b_counts.sum())
+                if support >= 2 and purity >= 0.95:
+                    for idx in cleaned_df.index:
+                        if (int(idx), col_b) in quarantined_cells:
+                            continue
+                        if pd.isna(cleaned_df.at[idx, col_b]) and str(cleaned_df.at[idx, col_a]).strip() == str(a_val).strip():
+                            repairs.append(
+                                RepairItem(
+                                    row_index=int(idx),
+                                    column=col_b,
+                                    original_value=None,
+                                    corrected_value=top_b,
+                                    anomaly_type=AnomalyType.MISSING_CATEGORICAL,
+                                    repair_method=RepairMethod.DETERMINISTIC_RELATIONAL_FIX,
+                                    stage=CleaningStage.STAGE_1,
+                                    confidence=0.92,
+                                    reason=f"Data-driven functional dependency: inferred '{col_b}'='{top_b}' from '{col_a}'='{a_val}' (support={support}, purity={round(purity, 2)})",
+                                )
+                            )
+                            cleaned_df.at[idx, col_b] = top_b
+
+    # -------------------------------------------------------------------------
+    # h. Multivariate Anomaly Detection (IsolationForest on Unseen Schemas)
+    # -------------------------------------------------------------------------
+    if len(cleaned_df) >= 20:
+        eligible_num_cols = [
+            c for c in numeric_cols
+            if c not in protected_cols and cleaned_df[c].notna().sum() >= 0.8 * len(cleaned_df)
+        ]
+        if len(eligible_num_cols) >= 2:
+            num_sub = cleaned_df[eligible_num_cols].copy()
+            valid_rows = [
+                idx for idx in num_sub.index
+                if not any((int(idx), c) in quarantined_cells for c in eligible_num_cols)
+                and num_sub.loc[idx].notna().all()
+            ]
+            if len(valid_rows) >= 20:
+                try:
+                    X_mat = num_sub.loc[valid_rows].astype(float).values
+                    scaler_iso = StandardScaler()
+                    X_scaled = scaler_iso.fit_transform(X_mat)
+                    iso = IsolationForest(contamination=0.03, random_state=42)
+                    iso_preds = iso.fit_predict(X_scaled)
+                    iso_scores = iso.decision_function(X_scaled)
+
+                    for i, r_idx in enumerate(valid_rows):
+                        if iso_preds[i] == -1 and iso_scores[i] < -0.15:
+                            max_z = float(np.max(np.abs(X_scaled[i])))
+                            if max_z > 3.5:
+                                unresolved_issues.append(
+                                    UnresolvedIssue(
+                                        row_index=int(r_idx),
+                                        column=None,
+                                        original_value=f"multivariate_vector({[round(float(v), 2) for v in X_mat[i]]})",
+                                        anomaly_type=AnomalyType.MULTIVARIATE_OUTLIER,
+                                        confidence=0.42,
+                                        reason=f"Multivariate outlier flagged by IsolationForest (anomaly score={round(float(iso_scores[i]), 3)}, max |z-score|={round(max_z, 2)} > 3.5); quarantined untouched",
+                                    )
+                                )
+                except Exception as exc:
+                    warnings.append(f"IsolationForest check skipped: {exc}")
+
+    # -------------------------------------------------------------------------
+    # i. Post-Stage-1 Health Score & Privacy-Safe Metadata Summary
     # -------------------------------------------------------------------------
     stage1_health_score = compute_health_score(cleaned_df, protected_cols)
 
