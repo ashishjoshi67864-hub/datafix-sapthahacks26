@@ -203,3 +203,36 @@ class RootCauseOutput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     diagnoses: List[RootCauseDiagnosis] = Field(default_factory=list)
+
+
+# ============================================================================
+# Interactive Review & Replay Script Schemas
+# ============================================================================
+
+class ApplyReviewRequest(BaseModel):
+    raw_csv: str = Field(..., min_length=1)
+    repairs: List[RepairItem] = Field(default_factory=list)
+    approved_indices: List[int] = Field(default_factory=list)
+
+
+class ApplyReviewResponse(BaseModel):
+    cleaned_csv: str
+    output_sha256: str
+    after_health_score: float
+    approved_count: int
+    rejected_count: int
+    cleaned_rows: int
+
+
+class ReproduceScriptRequest(BaseModel):
+    filename: str = Field(..., min_length=1)
+    repairs: List[RepairItem] = Field(default_factory=list)
+    input_sha256: str = Field(..., min_length=64, max_length=64)
+    expected_output_sha256: str = Field(..., min_length=64, max_length=64)
+    approved_indices: Optional[List[int]] = None
+
+
+class ReproduceScriptResponse(BaseModel):
+    script_filename: str
+    script_content: str
+

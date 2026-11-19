@@ -1,10 +1,12 @@
 """Stage 2 (DIAGNOSE + EXPLAIN): local Ollama detective operating strictly on summarized error metadata and unique value counts (never raw rows) with a deterministic rule-based fallback."""
 
 import difflib
+import hashlib
 import json
 import os
 import re
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
@@ -104,6 +106,67 @@ NUMERIC_TOKENS = {
     "num",
     "cost",
 }
+
+
+# ============================================================================
+# LLM Metadata-Only Prompt Cache Helper
+# ============================================================================
+
+def _get_llm_cache_dir() -> Path:
+    return Path(os.environ.get("DATAFIX_LLM_CACHE_DIR", "storage/llm_cache"))
+
+
+def _is_llm_cache_enabled() -> bool:
+    return os.environ.get("DATAFIX_ENABLE_LLM_CACHE", "1").strip().lower() not in ("0", "false", "no")
+
+
+def _cached_ollama_chat(
+    task_name: str,
+    model: str,
+    prompt: str,
+    output_schema_cls: Any,
+    client: Any,
+) -> Tuple[Any, bool]:
+    """Queries Ollama or loads from SHA-256 metadata-only cache."""
+    cache_enabled = _is_llm_cache_enabled()
+    cache_dir = _get_llm_cache_dir()
+
+    canonical_prompt = prompt.strip()
+    raw_key = f"{model}|{task_name}|{canonical_prompt}"
+    cache_key = hashlib.sha256(raw_key.encode("utf-8")).hexdigest()
+    cache_file = cache_dir / f"{cache_key}.json"
+
+    if cache_enabled and cache_file.exists():
+        try:
+            cached_text = cache_file.read_text(encoding="utf-8")
+            validated = output_schema_cls.model_validate_json(cached_text)
+            return validated, True
+        except Exception:
+            try:
+                cache_file.unlink(missing_ok=True)
+            except Exception:
+                pass
+
+    response = client.chat(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+        format="json",
+        keep_alive="10m",
+        options={"temperature": 0, "num_predict": 512},
+    )
+    content = response["message"]["content"]
+    validated = output_schema_cls.model_validate_json(content)
+
+    if cache_enabled:
+        try:
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            temp_file = cache_dir / f"{cache_key}.tmp_{os.getpid()}"
+            temp_file.write_text(content, encoding="utf-8")
+            temp_file.replace(cache_file)
+        except Exception:
+            pass
+
+    return validated, False
 
 
 # ============================================================================
@@ -295,15 +358,9 @@ def run_stage2_semantic_cleaning(
                     f'{{"column": "{col}", "mappings": [{{"original_value": "...", "standardized_value": "...", "reason": "..."}}]}}'
                 )
                 client = ollama.Client(timeout=ollama_timeout)
-                response = client.chat(
-                    model=target_model,
-                    messages=[{"role": "user", "content": prompt}],
-                    format="json",
-                    keep_alive="10m",
-                    options={"temperature": 0, "num_predict": 512},
+                parsed, _ = _cached_ollama_chat(
+                    "standardization", target_model, prompt, ColumnStandardizationOutput, client
                 )
-                content = response["message"]["content"]
-                parsed = ColumnStandardizationOutput.model_validate_json(content)
 
                 for item in parsed.mappings:
                     orig = item.original_value
@@ -481,15 +538,9 @@ def run_stage2_semantic_cleaning(
                 f'{{"proposals": [{{"row_index": 0, "column": "...", "proposed_value": "...", "evidence": "..."}}]}}'
             )
             client = ollama.Client(timeout=ollama_timeout)
-            response = client.chat(
-                model=target_model,
-                messages=[{"role": "user", "content": prompt}],
-                format="json",
-                keep_alive="10m",
-                options={"temperature": 0, "num_predict": 512},
+            parsed_inf, _ = _cached_ollama_chat(
+                "missing_value_inference", target_model, prompt, MissingValueInferenceOutput, client
             )
-            content = response["message"]["content"]
-            parsed_inf = MissingValueInferenceOutput.model_validate_json(content)
 
             items = getattr(parsed_inf, "proposals", None) or getattr(parsed_inf, "inferences", [])
             for inf in items:
@@ -612,15 +663,9 @@ def run_stage2_semantic_cleaning(
                 f'{{"diagnoses": [{{"cluster_id": "RC-...", "affected_columns": ["col1"], "likely_cause": "...", "affected_rows": 1, "recommended_action": "..."}}]}}'
             )
             client = ollama.Client(timeout=ollama_timeout)
-            response = client.chat(
-                model=target_model,
-                messages=[{"role": "user", "content": prompt}],
-                format="json",
-                keep_alive="10m",
-                options={"temperature": 0, "num_predict": 512},
+            parsed_rc, _ = _cached_ollama_chat(
+                "root_cause", target_model, prompt, RootCauseOutput, client
             )
-            content = response["message"]["content"]
-            parsed_rc = RootCauseOutput.model_validate_json(content)
             if parsed_rc.diagnoses:
                 root_cause_diagnoses = parsed_rc.diagnoses
         except Exception as e:

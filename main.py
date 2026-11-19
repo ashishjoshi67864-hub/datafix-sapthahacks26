@@ -1,5 +1,7 @@
 """FastAPI backend exposing /health and /clean endpoints with strict Pydantic v2 response contracts."""
 
+import re
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile, status
@@ -7,8 +9,19 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.concurrency import run_in_threadpool
 
 from ai_engine import check_ollama_health
-from pipeline import run_datafix_pipeline
-from schemas import DataFixResponse
+from ledger import get_audit_run, list_audit_runs, record_audit_run
+from pipeline import (
+    apply_selective_review,
+    generate_reproduce_script,
+    run_datafix_pipeline,
+)
+from schemas import (
+    ApplyReviewRequest,
+    ApplyReviewResponse,
+    DataFixResponse,
+    ReproduceScriptRequest,
+    ReproduceScriptResponse,
+)
 
 # ============================================================================
 # Application Setup & CORS
@@ -110,6 +123,11 @@ async def clean_csv(
             model=model,
             skip_stage2=skip_stage2,
         )
+        # Non-fatal persistent SQLite audit ledger entry
+        try:
+            record_audit_run(response, llm_mode=llm_mode or "auto")
+        except Exception:
+            pass
         return response
     except ValueError as ve:
         raise HTTPException(
@@ -121,6 +139,75 @@ async def clean_csv(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Pipeline execution failed: {exc}",
         )
+
+
+@app.get("/history", tags=["Audit Ledger"])
+def get_history(limit: int = Query(25, ge=1, le=100)) -> Dict[str, Any]:
+    """Returns recent cleaning run entries from the persistent SQLite audit ledger."""
+    runs = list_audit_runs(limit=limit)
+    return {"runs": runs}
+
+
+@app.get("/history/{run_id}", tags=["Audit Ledger"])
+def get_history_run(run_id: str) -> Dict[str, Any]:
+    """Returns detailed audit metadata for a specific run ID, or 404 if not found."""
+    run = get_audit_run(run_id)
+    if not run:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Audit run '{run_id}' not found.",
+        )
+    return run
+
+
+@app.post("/apply-review", response_model=ApplyReviewResponse, tags=["Review"])
+def apply_review_endpoint(payload: ApplyReviewRequest) -> ApplyReviewResponse:
+    """Selectively applies user-approved repairs to the raw CSV, reverting
+
+    rejected repairs and restoring rejected duplicate rows.
+    """
+    try:
+        raw_bytes = payload.raw_csv.encode("utf-8")
+        result = apply_selective_review(
+            raw_csv_bytes=raw_bytes,
+            repairs=payload.repairs,
+            approved_indices=payload.approved_indices,
+        )
+        return ApplyReviewResponse(**result)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Selective review application failed: {exc}",
+        )
+
+
+@app.post("/reproduce-script", response_model=ReproduceScriptResponse, tags=["Replay"])
+def reproduce_script_endpoint(payload: ReproduceScriptRequest) -> ReproduceScriptResponse:
+    """Generates a standalone, executable Python 3 replay script (reproduce_fix.py)
+
+    matching the exact SHA-256 provenance hash.
+    """
+    try:
+        stem = Path(payload.filename).stem or "dataset"
+        clean_stem = re.sub(r"[^\w\-]", "_", stem)
+        script_filename = f"reproduce_fix_{clean_stem}.py"
+        script_content = generate_reproduce_script(
+            filename=payload.filename,
+            repairs=payload.repairs,
+            input_sha256=payload.input_sha256,
+            expected_output_sha256=payload.expected_output_sha256,
+            approved_indices=payload.approved_indices,
+        )
+        return ReproduceScriptResponse(
+            script_filename=script_filename,
+            script_content=script_content,
+        )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Replay script generation failed: {exc}",
+        )
+
 
 
 if __name__ == "__main__":

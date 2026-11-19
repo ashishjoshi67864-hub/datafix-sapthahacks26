@@ -37,6 +37,10 @@ if "pipeline_result" not in st.session_state:
     st.session_state.pipeline_result = None
 if "run_latency_seconds" not in st.session_state:
     st.session_state.run_latency_seconds = None
+if "approved_repair_indices" not in st.session_state:
+    st.session_state.approved_repair_indices = None
+if "selective_review_banner" not in st.session_state:
+    st.session_state.selective_review_banner = None
 
 # ============================================================================
 # Constants & Built-in Benchmark Datasets
@@ -75,6 +79,30 @@ def fetch_health(base_url: str) -> Tuple[Optional[Dict[str, Any]], Optional[str]
         return None, f"HTTP {resp.status_code}: {resp.text}"
     except Exception as exc:
         return None, str(exc)
+
+
+def fetch_history(base_url: str, limit: int = 25) -> List[Dict[str, Any]]:
+    """Retrieves recent cleaning runs from the persistent SQLite audit ledger."""
+    try:
+        resp = httpx.get(f"{base_url.rstrip('/')}/history?limit={limit}", timeout=4.0)
+        if resp.status_code == 200:
+            return resp.json().get("runs", [])
+    except Exception:
+        pass
+    return []
+
+
+def fetch_reproduce_script(base_url: str, payload: Dict[str, Any]) -> Tuple[str, str]:
+    """Requests a standalone reproduce_fix.py replay script from the backend."""
+    try:
+        resp = httpx.post(f"{base_url.rstrip('/')}/reproduce-script", json=payload, timeout=10.0)
+        if resp.status_code == 200:
+            data = resp.json()
+            return data.get("script_filename", "reproduce_fix.py"), data.get("script_content", "")
+    except Exception:
+        pass
+    return "reproduce_fix.py", "# Failed to fetch replay script from backend API."
+
 
 
 # ============================================================================
@@ -1107,14 +1135,15 @@ if st.session_state.pipeline_result:
                 st.warning(w)
 
     # ========================================================================
-    # 4 Interactive Workbench Tabs (Zero Icons)
+    # 5 Interactive Workbench Tabs (Zero Icons)
     # ========================================================================
 
-    tab_diag, tab_val, tab_repairs, tab_export = st.tabs([
+    tab_diag, tab_val, tab_repairs, tab_export, tab_history = st.tabs([
         "Root-Cause Diagnosis & Analytics",
         "Validation & Blast-Radius Trust",
         "Auditable Repair Trail",
         "Before vs. After & Export Center",
+        "Run History Ledger",
     ])
 
     # ------------------------------------------------------------------------
@@ -1271,7 +1300,10 @@ if st.session_state.pipeline_result:
                     filtered_df["corrected_value"].astype(str).str.lower().str.contains(q)
                 ]
 
-            view_format = st.radio("Display Format:", ["Git-Style Diff Cards", "Interactive Data Table"], horizontal=True)
+            if st.session_state.get("selective_review_banner"):
+                st.info(st.session_state.selective_review_banner)
+
+            view_format = st.radio("Display Format:", ["Git-Style Diff Cards", "Interactive Review & Data Table"], horizontal=True)
 
             if view_format == "Git-Style Diff Cards":
                 st.caption(f"Showing top {min(25, len(filtered_df))} of {len(filtered_df)} filtered repairs:")
@@ -1307,11 +1339,28 @@ if st.session_state.pipeline_result:
                         unsafe_allow_html=True,
                     )
             else:
-                st.dataframe(
-                    filtered_df,
+                st.caption(
+                    "Check or uncheck individual repairs below to selectively approve or roll them back, "
+                    "then click 'Apply Selective Review' to update the dataset and recalculate the health score."
+                )
+
+                # Initialize approved repair indices set
+                if st.session_state.approved_repair_indices is None or len(st.session_state.approved_repair_indices) > len(repairs):
+                    st.session_state.approved_repair_indices = set(range(len(repairs)))
+
+                editor_df = filtered_df.copy()
+                editor_df.insert(0, "Approve", [idx in st.session_state.approved_repair_indices for idx in editor_df.index])
+
+                edited_rep_df = st.data_editor(
+                    editor_df,
                     use_container_width=True,
                     hide_index=True,
                     column_config={
+                        "Approve": st.column_config.CheckboxColumn(
+                            "Approve",
+                            help="Check to approve and apply this repair; uncheck to reject and revert to raw original value.",
+                            default=True,
+                        ),
                         "confidence": st.column_config.ProgressColumn(
                             "Confidence",
                             min_value=0.0,
@@ -1319,7 +1368,48 @@ if st.session_state.pipeline_result:
                             format="%.2f",
                         ),
                     },
+                    disabled=[c for c in editor_df.columns if c != "Approve"],
+                    key="repairs_editor_table",
                 )
+
+                col_rev_btn, _ = st.columns([2, 5])
+                with col_rev_btn:
+                    if st.button("Apply Selective Review", type="primary", use_container_width=True):
+                        new_approved = set(st.session_state.approved_repair_indices)
+                        for orig_idx, is_approved in zip(editor_df.index, edited_rep_df["Approve"]):
+                            if is_approved:
+                                new_approved.add(int(orig_idx))
+                            else:
+                                new_approved.discard(int(orig_idx))
+
+                        try:
+                            raw_csv_str = st.session_state.raw_csv_bytes.decode("utf-8-sig", errors="replace")
+                            rev_payload = {
+                                "raw_csv": raw_csv_str,
+                                "repairs": repairs,
+                                "approved_indices": sorted(list(new_approved)),
+                            }
+                            with st.spinner("Applying selective review to dataset..."):
+                                rev_resp = httpx.post(f"{api_url.rstrip('/')}/apply-review", json=rev_payload, timeout=30.0)
+
+                            if rev_resp.status_code == 200:
+                                rev_data = rev_resp.json()
+                                st.session_state.pipeline_result["cleaned_csv"] = rev_data["cleaned_csv"]
+                                st.session_state.pipeline_result["quality_report"]["output_sha256"] = rev_data["output_sha256"]
+                                st.session_state.pipeline_result["quality_report"]["after_health_score"] = rev_data["after_health_score"]
+                                st.session_state.approved_repair_indices = new_approved
+                                st.session_state.selective_review_banner = (
+                                    f"Selective Review Applied: {rev_data['approved_count']} Approved | "
+                                    f"{rev_data['rejected_count']} Rolled Back | New SHA-256: {rev_data['output_sha256'][:16]}... "
+                                    f"(Health Score: {rev_data['after_health_score']:.2f}%)"
+                                )
+                                st.toast("Selective review applied successfully!")
+                                st.rerun()
+                            else:
+                                st.error(f"Failed to apply review ({rev_resp.status_code}): {rev_resp.text}")
+                        except Exception as err:
+                            st.error(f"Error communicating with backend: {err}")
+
                 st.caption(f"Showing {len(filtered_df)} of {len(rep_df)} total repairs.")
         else:
             st.info("No repairs were needed; dataset was already completely clean.")
@@ -1330,7 +1420,7 @@ if st.session_state.pipeline_result:
     with tab_export:
         st.markdown("#### Export Center: Cleaned Data & Audit Reports")
 
-        exp1, exp2, exp3 = st.columns(3)
+        exp1, exp2, exp3, exp4 = st.columns(4)
         cleaned_csv_str = result.get("cleaned_csv", "")
         stem = Path(st.session_state.raw_filename).stem
 
@@ -1347,7 +1437,7 @@ if st.session_state.pipeline_result:
             audit_payload = {k: v for k, v in result.items() if k != "cleaned_csv"}
             audit_json = json.dumps(audit_payload, indent=2)
             st.download_button(
-                label="Download Audit Report (JSON)",
+                label="Download Audit JSON",
                 data=audit_json,
                 file_name=f"{stem}_audit_report.json",
                 mime="application/json",
@@ -1360,11 +1450,33 @@ if st.session_state.pipeline_result:
                 latency=st.session_state.run_latency_seconds,
             )
             st.download_button(
-                label="Download Motion Report (HTML)",
+                label="Download Motion HTML",
                 data=html_report,
                 file_name=f"{stem}_quality_report.html",
                 mime="text/html",
                 use_container_width=True,
+            )
+        with exp4:
+            approved_list = (
+                sorted(list(st.session_state.approved_repair_indices))
+                if st.session_state.get("approved_repair_indices") is not None
+                else list(range(len(repairs)))
+            )
+            script_payload = {
+                "filename": st.session_state.raw_filename,
+                "repairs": repairs,
+                "input_sha256": quality_report.get("input_sha256", ""),
+                "expected_output_sha256": quality_report.get("output_sha256", ""),
+                "approved_indices": approved_list,
+            }
+            script_fn, script_body = fetch_reproduce_script(api_url, script_payload)
+            st.download_button(
+                label="Download Replay Script (.py)",
+                data=script_body,
+                file_name=script_fn,
+                mime="text/x-python",
+                use_container_width=True,
+                help="Standalone executable Python script to replay verified repairs deterministically with zero dependencies.",
             )
 
         st.markdown("---")
@@ -1402,3 +1514,39 @@ if st.session_state.pipeline_result:
 
             styled_cleaned = cleaned_df.head(100).style.apply(highlight_mutations, axis=None)
             st.dataframe(styled_cleaned, use_container_width=True)
+
+    # ------------------------------------------------------------------------
+    # Tab 5: Run History Ledger (Persistent SQLite DB)
+    # ------------------------------------------------------------------------
+    with tab_history:
+        st.markdown("#### Persistent SQLite Audit Ledger")
+        st.caption("Cryptographic audit trail of all previous cleaning runs recorded in storage/audit_ledger.db.")
+
+        col_h_refresh, _ = st.columns([2, 5])
+        with col_h_refresh:
+            if st.button("Refresh Audit Ledger", use_container_width=True):
+                st.session_state.pop("cached_history", None)
+
+        history_runs = fetch_history(api_url, limit=50)
+        if history_runs:
+            history_rows = []
+            for run_item in history_runs:
+                history_rows.append({
+                    "Run ID": run_item.get("run_id"),
+                    "Timestamp (UTC)": str(run_item.get("timestamp_utc", ""))[:19].replace("T", " "),
+                    "Filename": run_item.get("filename"),
+                    "Status": run_item.get("status"),
+                    "Mode": run_item.get("llm_mode"),
+                    "Original Rows": run_item.get("original_rows"),
+                    "Cleaned Rows": run_item.get("cleaned_rows"),
+                    "Repairs": run_item.get("total_repairs"),
+                    "Unresolved": run_item.get("unresolved_count"),
+                    "Before Health": f"{float(run_item.get('before_health_score', 0.0)):.2f}%",
+                    "After Health": f"{float(run_item.get('after_health_score', 0.0)):.2f}%",
+                    "Input SHA-256": f"{str(run_item.get('input_sha256', ''))[:12]}...",
+                    "Output SHA-256": f"{str(run_item.get('output_sha256', ''))[:12]}...",
+                })
+            st.dataframe(pd.DataFrame(history_rows), use_container_width=True, hide_index=True)
+        else:
+            st.info("No audit runs recorded yet. Execute a cleaning run to populate the ledger.")
+

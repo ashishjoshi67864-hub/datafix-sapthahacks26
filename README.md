@@ -2,14 +2,14 @@
 
 > **SAPTHAHACKS'26 — INNOVEDGE PS 01**  
 > **Team:** Utsava V, Ashish Joshi, Utsav Panduranga, Vanaja Y  
-> **Status:** 100% Complete • 52/52 Pytest Verification Suite Passing • Judge Ready
+> **Status:** 100% Complete • 56/56 Pytest Verification Suite Passing • Judge Ready
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.32.0-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Pydantic v2](https://img.shields.io/badge/Pydantic-v2.6.1-E92063.svg?logo=pydantic&logoColor=white)](https://docs.pydantic.dev)
 [![Ollama](https://img.shields.io/badge/Ollama-qwen2.5:3b-black.svg?logo=ollama&logoColor=white)](https://ollama.ai)
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Pytest-52%20Passed-brightgreen.svg)](https://pytest.org)
+[![Tests](https://img.shields.io/badge/Pytest-56%20Passed-brightgreen.svg)](https://pytest.org)
 
 ---
 
@@ -175,7 +175,7 @@ streamlit run app.py
 
 ### Step 3: Run the Automated Verification Suite
 
-Run all 52 unit and integration tests across schemas, Stage 1 engine, KS statistical drift, Stage 2 AI guardrails, FastAPI endpoints, Streamlit AST safety, reproducibility, idempotency, UTF-8 BOM handling, clean-CSV guards, calibrated health scores, IsolationForest multivariate outliers, near-duplicate quarantine, and 10,000-row scalability throughput:
+Run all 56 unit and integration tests across schemas, Stage 1 engine, KS statistical drift, Stage 2 AI guardrails, FastAPI endpoints, Streamlit AST safety, reproducibility, idempotency, UTF-8 BOM handling, clean-CSV guards, calibrated health scores, IsolationForest multivariate outliers, near-duplicate quarantine, 10,000-row scalability throughput, SQLite audit ledger, interactive Git-style review rollback, reproduce_fix.py replay execution, and Ollama SHA-256 metadata prompt caching:
 
 ```bash
 # Windows
@@ -187,7 +187,7 @@ python -m pytest -v
 
 **Expected output:**
 ```text
-======================= 52 passed in ~9s =======================
+======================= 56 passed in ~10s =======================
 ```
 
 ---
@@ -224,7 +224,7 @@ Probes system readiness and local Ollama daemon reachability.
 ```
 
 ### 3. `POST /clean`
-Stateless multipart file upload executing the complete neuro-symbolic repair pipeline.
+Stateless multipart file upload executing the complete neuro-symbolic repair pipeline and automatically logging to the persistent SQLite audit ledger.
 
 - **Query Parameters:**
   - `llm_mode` *(optional, string)*: `"auto"` (default), `"deterministic"`, or `"ollama"`.
@@ -241,6 +241,22 @@ Stateless multipart file upload executing the complete neuro-symbolic repair pip
   - `unresolved_issues`: Quarantined cells with confidence `< 0.60` left unmutated.
   - `root_cause_diagnoses`: Aggregated root-cause clusters explaining upstream ingestion failures.
   - `cleaned_csv`: Fully sanitized, UTF-8 CSV string ready for download.
+
+### 4. `GET /history` & `GET /history/{run_id}`
+Queries previous pipeline executions from the persistent SQLite audit ledger (`storage/audit_ledger.db`).
+- `GET /history?limit=25`: Returns ordered list of recent runs with execution timestamps, file names, row counts, health scores, and SHA-256 hashes.
+- `GET /history/{run_id}`: Returns the full audit metadata and summary payload for a specific run ID (or `404 Not Found`).
+
+### 5. `POST /apply-review`
+Enables interactive Git-style selective approval or rollback of individual repair items.
+- **Payload (`ApplyReviewRequest`):** `{"raw_csv": "...", "repairs": [...], "approved_indices": [0, 1, 3]}`
+- **Response (`ApplyReviewResponse`):** Re-serializes the dataset applying ONLY approved repairs, restoring rejected duplicate rows and reverting rejected cells to raw values, and recalculates the post-repair health score and output SHA-256 digest.
+
+### 6. `POST /reproduce-script`
+Generates a standalone, executable Python 3 script (`reproduce_fix.py`) embedded with cryptographic provenance hashes.
+- **Payload (`ReproduceScriptRequest`):** `{"filename": "...", "repairs": [...], "input_sha256": "...", "expected_output_sha256": "...", "approved_indices": [...]}`
+- **Execution:** Replays repairs deterministically via `python reproduce_fix.py input.csv output.csv` using Python stdlib (or Pandas if present), producing byte-for-byte SHA-256 verification.
+
 
 ---
 

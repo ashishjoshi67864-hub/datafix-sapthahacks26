@@ -273,8 +273,9 @@ def test_stage2_rejects_hallucinated_llm_category_and_invalid_json():
         "message": {"content": "not valid json"}
     }
 
-    with patch("ollama.Client", return_value=mock_client_bad_json):
-        res2 = run_stage2_semantic_cleaning(stage1_res, llm_mode="ollama")
+    with patch.dict("os.environ", {"DATAFIX_ENABLE_LLM_CACHE": "0"}):
+        with patch("ollama.Client", return_value=mock_client_bad_json):
+            res2 = run_stage2_semantic_cleaning(stage1_res, llm_mode="ollama")
 
     # Must not crash, records warning, and fallback successfully repairs data
     assert isinstance(res2, Stage2Result)
@@ -764,4 +765,223 @@ def test_scalability_10000_rows_throughput():
     assert resp.summary.total_repairs >= 100  # HTML tags and whitespace repaired
     assert resp.quality_report.after_health_score >= resp.quality_report.before_health_score
     assert duration < 10.0, f"Pipeline exceeded 10.0s SLA on 10k rows (took {duration:.2f}s)"
+
+
+# ============================================================================
+# g) Phase B Tests: SQLite Audit Ledger, Selective Review, Replay Script, & LLM Cache
+# ============================================================================
+
+def test_sqlite_audit_ledger_and_history_endpoints(tmp_path, monkeypatch):
+    """Verifies persistent SQLite audit ledger integration: POST /clean automatically
+    records run metadata, GET /history lists the run, and GET /history/{run_id} returns
+    detailed run data (and 404 for unknown run_id).
+    """
+    test_db = tmp_path / "test_audit_ledger.db"
+    monkeypatch.setenv("DATAFIX_LEDGER_DB", str(test_db))
+
+    client = TestClient(fastapi_app)
+    csv_bytes = SAMPLE_DIRTY_PATH.read_bytes()
+
+    # 1. Clean dataset via POST /clean
+    clean_resp = client.post(
+        "/clean?llm_mode=deterministic",
+        files={"file": ("sample_dirty.csv", csv_bytes, "text/csv")},
+    )
+    assert clean_resp.status_code == 200
+    resp_data = clean_resp.json()
+    in_sha = resp_data["quality_report"]["input_sha256"]
+    out_sha = resp_data["quality_report"]["output_sha256"]
+
+    # 2. Query GET /history
+    hist_resp = client.get("/history?limit=10")
+    assert hist_resp.status_code == 200
+    runs = hist_resp.json().get("runs", [])
+    assert len(runs) >= 1
+    target_run = runs[0]
+    assert target_run["filename"] == "sample_dirty.csv"
+    assert target_run["input_sha256"] == in_sha
+    assert target_run["output_sha256"] == out_sha
+    assert target_run["total_repairs"] == resp_data["summary"]["total_repairs"]
+    run_id = target_run["run_id"]
+
+    # 3. Query GET /history/{run_id}
+    detail_resp = client.get(f"/history/{run_id}")
+    assert detail_resp.status_code == 200
+    detail = detail_resp.json()
+    assert detail["run_id"] == run_id
+    assert "response_summary" in detail
+    assert detail["response_summary"]["summary"]["total_repairs"] == resp_data["summary"]["total_repairs"]
+
+    # 4. Unknown run_id returns 404
+    err_resp = client.get("/history/non_existent_run_id_123")
+    assert err_resp.status_code == 404
+
+
+def test_selective_review_rollback_reverts_rejected_repair():
+    """Verifies interactive Git-style selective repair rollback: POST /apply-review
+    allows rejecting individual repairs, reverting only the rejected cells back to
+    their raw original values while applying all approved repairs.
+    """
+    client = TestClient(fastapi_app)
+    csv_bytes = SAMPLE_DIRTY_PATH.read_bytes()
+
+    # 1. First run /clean to get repairs list
+    clean_resp = client.post(
+        "/clean?llm_mode=deterministic",
+        files={"file": ("sample_dirty.csv", csv_bytes, "text/csv")},
+    )
+    assert clean_resp.status_code == 200
+    resp_data = clean_resp.json()
+    repairs = resp_data["repairs"]
+    assert len(repairs) > 0
+
+    # Find first cell-level repair to selectively reject
+    cell_idx = next(i for i, r in enumerate(repairs) if r["column"] is not None)
+    rejected_repair = repairs[cell_idx]
+    target_row = rejected_repair["row_index"]
+    target_col = rejected_repair["column"]
+    target_raw_val = rejected_repair["original_value"]
+
+    # Approve all repairs EXCEPT the chosen one
+    approved_indices = [i for i in range(len(repairs)) if i != cell_idx]
+
+    review_payload = {
+        "raw_csv": csv_bytes.decode("utf-8-sig"),
+        "repairs": repairs,
+        "approved_indices": approved_indices,
+    }
+    rev_resp = client.post("/apply-review", json=review_payload)
+    assert rev_resp.status_code == 200
+    rev_data = rev_resp.json()
+
+    assert rev_data["rejected_count"] == 1
+    assert rev_data["approved_count"] == len(repairs) - 1
+    assert rev_data["output_sha256"] != resp_data["quality_report"]["output_sha256"]
+
+    # Verify that the rejected cell reverted to its raw original value in the returned CSV
+    df_reviewed = pd.read_csv(io.StringIO(rev_data["cleaned_csv"]), dtype=str)
+    assert df_reviewed.at[target_row, target_col] == str(target_raw_val)
+
+
+def test_reproduce_fix_script_executes_and_matches_sha256(tmp_path):
+    """Verifies that the standalone replay script generated by POST /reproduce-script
+    is fully executable with standard Python, executes without errors, and reproduces
+    the exact output SHA-256 byte-for-byte.
+    """
+    import subprocess
+    import sys
+
+    client = TestClient(fastapi_app)
+    csv_bytes = SAMPLE_DIRTY_PATH.read_bytes()
+
+    clean_resp = client.post(
+        "/clean?llm_mode=deterministic",
+        files={"file": ("sample_dirty.csv", csv_bytes, "text/csv")},
+    )
+    assert clean_resp.status_code == 200
+    resp_data = clean_resp.json()
+    expected_out_sha = resp_data["quality_report"]["output_sha256"]
+
+    script_payload = {
+        "filename": "sample_dirty.csv",
+        "repairs": resp_data["repairs"],
+        "input_sha256": resp_data["quality_report"]["input_sha256"],
+        "expected_output_sha256": expected_out_sha,
+        "approved_indices": None,
+    }
+    script_resp = client.post("/reproduce-script", json=script_payload)
+    assert script_resp.status_code == 200
+    script_json = script_resp.json()
+    script_content = script_json["script_content"]
+
+    # Write script to temporary folder
+    script_file = tmp_path / script_json["script_filename"]
+    script_file.write_text(script_content, encoding="utf-8")
+    out_csv = tmp_path / "replay_output.csv"
+
+    # Actually execute the generated script using the current Python interpreter
+    run_res = subprocess.run(
+        [sys.executable, str(script_file), str(SAMPLE_DIRTY_PATH.resolve()), str(out_csv)],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    assert run_res.returncode == 0
+    assert "VERIFICATION PASSED" in run_res.stdout
+
+    # Verify byte-for-byte SHA-256 match
+    import hashlib
+    actual_out_sha = hashlib.sha256(out_csv.read_bytes()).hexdigest()
+    assert actual_out_sha == expected_out_sha, (
+        f"Replay script output SHA-256 ({actual_out_sha}) must match "
+        f"DataFixResponse output SHA-256 ({expected_out_sha}) byte-for-byte"
+    )
+
+
+def test_ollama_sha256_metadata_cache_hit(tmp_path, monkeypatch):
+    """Verifies that the SHA-256 metadata-only Ollama prompt cache eliminates redundant
+    LLM inference: second run on identical Stage1Result loads from cache with zero new Ollama calls.
+    """
+    cache_dir = tmp_path / "llm_cache"
+    monkeypatch.setenv("DATAFIX_LLM_CACHE_DIR", str(cache_dir))
+    monkeypatch.setenv("DATAFIX_ENABLE_LLM_CACHE", "1")
+
+    df = load_csv(SAMPLE_DIRTY_PATH)
+    stage1_res = run_stage1_cleaning(df)
+
+    # Mock Ollama client
+    mock_ollama_module = MagicMock()
+    mock_client = MagicMock()
+    mock_ollama_module.Client.return_value = mock_client
+
+    # Return valid mock JSON tailored to the requested schema
+    def mock_chat_side_effect(*args, **kwargs):
+        messages = kwargs.get("messages", [])
+        prompt_text = messages[0]["content"] if messages else ""
+        if "Missing categorical cells" in prompt_text:
+            return {"message": {"content": json.dumps({"proposals": []})}}
+        elif "master tabular data quality detective" in prompt_text:
+            return {"message": {"content": json.dumps({"diagnoses": []})}}
+        else:
+            return {
+                "message": {
+                    "content": json.dumps({
+                        "column": "city",
+                        "mappings": [
+                            {
+                                "original_value": "BLR",
+                                "standardized_value": "Bengaluru",
+                                "reason": "Standardized abbreviation",
+                            }
+                        ],
+                    })
+                }
+            }
+
+    mock_client.chat.side_effect = mock_chat_side_effect
+
+    # First pass: cache miss, calls Ollama
+    with patch.dict("sys.modules", {"ollama": mock_ollama_module}):
+        with patch("ai_engine.check_ollama_health", return_value={"reachable": True, "model": "qwen2.5:3b", "model_available": True}):
+            res1 = run_stage2_semantic_cleaning(stage1_res, llm_mode="ollama")
+
+    initial_call_count = mock_client.chat.call_count
+    assert initial_call_count >= 1, "First run must query Ollama on cache miss"
+
+    # Second pass: cache hit, zero new calls to mock_client.chat
+    with patch.dict("sys.modules", {"ollama": mock_ollama_module}):
+        with patch("ai_engine.check_ollama_health", return_value={"reachable": True, "model": "qwen2.5:3b", "model_available": True}):
+            res2 = run_stage2_semantic_cleaning(stage1_res, llm_mode="ollama")
+
+    second_call_count = mock_client.chat.call_count
+    assert second_call_count == initial_call_count, (
+        f"Second run should have hit cache with 0 new Ollama calls, "
+        f"but call count increased from {initial_call_count} to {second_call_count}"
+    )
+
+    # Ensure output results match
+    assert len(res1.repairs) == len(res2.repairs)
+    assert res1.mode_used == res2.mode_used == "ollama"
+    assert res1.ollama_used is True and res2.ollama_used is True
+
 
